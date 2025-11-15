@@ -1,7 +1,7 @@
 # Hyperspectral Image Classification Configuration
 
 dataset:
-  folder: "Matlab_data_format/WHU-Hi-HanChuan"
+  folder: "dataset_path"
   patch_size: 11
   stride: 1
   
