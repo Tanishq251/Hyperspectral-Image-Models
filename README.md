@@ -14,7 +14,7 @@ HSI_Pipeline/
 ├── train.py                 # Main training script
 ├── DBCTnet.py              # DBCTNet model implementation
 ├── M3DRecNet.py            # 3DRecNet (HSIVit) model implementation
-├── Matlab_data_format/     # Dataset directory (you create this)
+├── datasets_folder/     # Dataset directory (you create this)
 │   └── <dataset_name>/
 │       ├── <name>_data.mat  # Hyperspectral data file
 │       └── <name>_gt.mat    # Ground truth labels file
@@ -41,7 +41,7 @@ HSI_Pipeline/
 Your dataset must follow this naming convention:
 
 ```
-Matlab_data_format/
+dataset_folder/
 └── <YourDatasetName>/
     ├── <name>_data.mat    # Hyperspectral image data
     └── <name>_gt.mat      # Ground truth labels
