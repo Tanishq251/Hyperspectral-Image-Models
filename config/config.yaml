@@ -1,0 +1,48 @@
+# Hyperspectral Image Classification Configuration
+
+dataset:
+  datasets_folder: "datasets" # Root folder containing all datasets
+  use_all: False # Set to True to run on all datasets in the folder
+  names: ["WHU-Hi-HanChuan"] # List of dataset names to use (ignored if use_all is True)
+  patch_size: 11
+  stride: 1
+  verbose: True # Print dataset loading info
+
+data_split:
+  method: "ratio" # "ratio" or "samples"
+  split_ratios: [0.3, 0.1, 0.6] #[0.3, 0.1, 0.8]  # [train, val, test]
+  split_samples: null # [30, 10] for sample-based split
+  random_state: 42
+  print_stats: True # Print dataset split statistics
+
+preprocessing:
+  dim_reduction_method: "pca" # "pca", "maxpool", or null
+  num_pca_bands: 30
+  maxpool_kernel: 2
+  use_channel_dim: true
+  band_axis: "channels_first" # "channels_first" or "channels_last"
+  band_indices: null
+
+model:
+  name: "DBCTNet" # "DBCTNet" "3DRecNet"
+  run_all_models: False # Set to true to run all available models
+  print_summary: True # Print model summary using torchinfo
+  summary_only: False # Set to True to ONLY print summary and skip training
+  summary_depth: 10 # Depth for model summary
+
+training:
+  num_epochs: 100
+  num_runs: 3
+  batch_size: 64
+  learning_rate: 0.002
+  patience: 100
+  checkpoint_interval: 10
+  num_workers: 4
+
+device:
+  use_cuda: true # Set to false to force CPU
+
+visualization:
+  cmap: "jet"
+  show_colorbar: false # Show colorbar legend
+  dpi: 600 # Image resolution
