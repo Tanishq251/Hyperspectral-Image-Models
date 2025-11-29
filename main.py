@@ -7,6 +7,84 @@ from models.M3DRecNet import HSIVit
 from config.config_loader import load_config
 
 
+
+# Set USE_INLINE_CONFIG = True to use settings below instead of config.yaml
+USE_INLINE_CONFIG = True
+
+INLINE_CONFIG = {
+    'dataset': {
+        'datasets_folder': 'datasets',
+        'use_all': False,
+        'names': ['WHU-Hi-HanChuan'],
+        'patch_size': 11,
+        'stride': 1,
+        'verbose': True
+    },
+    'data_split': {
+        'method': 'ratio',
+        'split_ratios': [0.3, 0.1, 0.6],
+        'split_samples': None,
+        'random_state': 42,
+        'print_stats': True
+    },
+    'preprocessing': {
+        'dim_reduction_method': 'pca',
+        'num_pca_bands': 30,
+        'maxpool_kernel': 2,
+        'use_channel_dim': True,
+        'band_axis': 'channels_first',
+        'band_indices': None
+    },
+    'model': {
+        'name': 'DBCTNet',
+        'run_all_models': False,
+        'print_summary': True,
+        'summary_only': False,
+        'summary_depth': 10
+    },
+    'training': {
+        'num_epochs': 100,
+        'num_runs': 3,
+        'batch_size': 64,
+        'learning_rate': 0.002,
+        'patience': 100,
+        'checkpoint_interval': 10,
+        'num_workers': 4
+    },
+    'device': {
+        'use_cuda': True
+    },
+    'visualization': {
+        'cmap': 'jet',
+        'show_colorbar': False,
+        'dpi': 600
+    }
+}
+
+
+class InlineConfig:
+    """Simple config class for inline dictionary configuration"""
+    def __init__(self, config_dict):
+        self.config = config_dict
+    
+    def get(self, key, default=None):
+        keys = key.split('.')
+        value = self.config
+        for k in keys:
+            if isinstance(value, dict):
+                value = value.get(k, default)
+            else:
+                return default
+        return value
+    
+    def __getitem__(self, key):
+        return self.get(key)
+    
+    def to_dict(self):
+        return self.config
+# ============================================================================
+
+
 def print_model_summary(model, input_shape, device='cuda'):
     """Print model summary using torchinfo"""
     try:
@@ -138,7 +216,13 @@ def run_single_experiment(cfg, model_name=None, run_number=None, dataset_name=No
 def main(config_path="config/config.yaml"):
     """Main entry point for training"""
     
-    cfg = load_config(config_path)
+    # Load configuration: inline dict or YAML file
+    if USE_INLINE_CONFIG:
+        print("Using INLINE_CONFIG from main.py")
+        cfg = InlineConfig(INLINE_CONFIG)
+    else:
+        print(f"Loading config from: {config_path}")
+        cfg = load_config(config_path)
     
     # Get configuration for multiple runs, models, and datasets
     num_runs = cfg.get('training.num_runs', 1)
