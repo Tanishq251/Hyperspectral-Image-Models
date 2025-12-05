@@ -1,392 +1,414 @@
 # HSI_Pipeline
 
-**Datasets_link** : https://drive.google.com/drive/folders/1NPrnUrCm0o_xNBq6obRMYzBFGYBQoN5C 
+A comprehensive deep learning framework for Hyperspectral Image (HSI) classification with 21 state-of-the-art models and 23 benchmark datasets. Features automated experiment management, flexible YAML configuration, and advanced visualization tools.
 
-A modular and configuration-driven pipeline for **Hyperspectral Image (HSI) Classification**. This pipeline supports multiple deep learning models, flexible data splitting, preprocessing options, and automated result tracking.
+## 🌟 Key Features
 
-## Features
+- **21 State-of-the-Art Models** - Transformers, Mamba-based, CNNs, and hybrid architectures
+- **23 Benchmark Datasets** - Auto-download from Hugging Face Hub
+- **Single YAML Configuration** - Control everything from one config file
+- **Automated Experiments** - Run multiple models × datasets × runs automatically
+- **Smart Visualization** - Classification maps with customizable colormaps
+- **Map Arrangement Tool** - Create publication-ready figure grids
+- **Comprehensive Metrics** - OA, AA, Kappa, per-class accuracy with CSV export
 
-✨ **Key Capabilities:**
-- **Multi-Model Support**: DBCTNet and 3DRecNet (HSIVit) models
-- **Flexible Configuration**: YAML-based or inline dictionary configuration
-- **Multiple Data Splitting Strategies**: Ratio-based or sample-based splits
-- **Advanced Preprocessing**: PCA dimensionality reduction, MaxPooling, channel dimension handling
-- **Comprehensive Metrics**: OA, AA, Kappa, per-class accuracies
-- **Automated Checkpointing**: Save model at regular intervals and best epochs
-- **Result Tracking**: Organized results with training logs and classification maps
-- **Multi-Run Experiments**: Statistical analysis with multiple independent runs
-- **Model Summarization**: Print model architecture and parameter counts
-- **Visualization**: Classification maps with customizable colormaps and DPI
+---
 
-## Project Structure
+## 🤗 Hugging Face Dataset Hub
 
-```
-HSI_Pipeline/
-├── main.py                      # Entry point with inline config support
-├── config/
-│   ├── config.yaml              # YAML configuration file
-│   └── config_loader.py         # Configuration parser
-├── models/
-│   ├── DBCTnet.py               # DBCTNet model implementation
-│   ├── M3DRecNet.py             # 3DRecNet (HSIVit) model implementation
-│   └── __init__.py
-├── utils/
-│   ├── data_loader.py           # Dataset loading and preprocessing
-│   ├── data_split.py            # Data splitting strategies
-│   ├── experiment.py            # Experiment setup and initialization
-│   ├── trainer.py               # Training loop and model management
-│   ├── metrics.py               # Metrics calculation and post-training analysis
-│   ├── visualization.py         # Result visualization and classification maps
-│   └── __init__.py
-├── datasets_folder/             # Dataset directory (you create this)
-│   └── <dataset_name>/
-│       ├── <name>_data.mat      # Hyperspectral image data
-│       └── <name>_gt.mat        # Ground truth labels
-└── results/                     # Auto-generated results directory
-    └── <dataset_name>/
-        └── <model_name>/
-            ├── run_1/
-            │   ├── config.json
-            │   ├── best_model.pth
-            │   ├── final_model.pth
-            │   ├── checkpoint_epoch_*.pth
-            │   ├── training_log.txt
-            │   └── classification_map.png
-            ├── run_2/
-            ├── run_3/
-            └── results_summary.xlsx
-```
-
-## Dataset Preparation
-
-### Required Format
-
-Your dataset must follow this naming convention:
-
-```
-dataset_folder/
-└── <dataset_name>/
-    ├── <dataset_name>_data.mat  # Hyperspectral image data
-    └── <dataset_name>_gt.mat    # Ground truth labels
-```
-
-### Data File Structure
-
-#### 1. `<name>_data.mat`
-
-- **Variable name**: `data` (or variations: `Data`, `IMAGE`, `hsi`, `cube`, etc.)
-- **Shape**: `(bands, height, width)` or `(height, width, bands)` - auto-detected
-- **Type**: Float/Integer array
-- **Example**: `(224, 224, 144)` for 224x224 pixels with 144 spectral bands
-
-#### 2. `<name>_gt.mat`
-
-- **Variable name**: `gt` (or variations: `GT`, `label`, `mask`, etc.)
-- **Shape**: `(height, width)`
-- **Values**: Integer class labels (1, 2, 3, ..., N)
-  - **0** represents unlabeled/background pixels
-
-### Example Dataset Setup
+> **All datasets are hosted on Hugging Face and automatically downloaded to cache!**
+>
+> � **[HSI_Pipeline Datasets](https://huggingface.co/datasets/Tanishq165/HSI_Datasets)**
 
 ```bash
-# Create dataset directory
-mkdir -p datasets/WHU-Hi-HanChuan
+# List all available datasets
+python main.py --list-datasets
 
-# Place your files
-datasets/WHU-Hi-HanChuan/
-├── WHU-Hi-HanChuan_data.mat
-└── WHU-Hi-HanChuan_gt.mat
+# List all available models
+python main.py --list-models
 ```
 
-### Supported Data Formats
+---
 
-- **.mat files** (MATLAB format) - Automatically loads `data` and `gt` keys
-- **.tif files** (GeoTIFF) - Loads raster data with rasterio
-
-## Configuration
-
-Edit `config/config.yaml` or use `INLINE_CONFIG` in `main.py` to customize your experiment.
-
-### Main Configuration Sections
-
-#### Dataset Settings
-
-```yaml
-dataset:
-  datasets_folder: "datasets"      # Path to dataset folder
-  use_all: false                   # Run on all datasets in folder
-  names: ['WHU-Hi-HanChuan']       # Dataset names to use
-  patch_size: 11                   # Spatial patch size (e.g., 11x11)
-  stride: 1                        # Sampling stride
-  verbose: true                    # Print debug info
-```
-
-#### Data Splitting
-
-```yaml
-data_split:
-  method: "ratio"                  # "ratio" or "samples"
-  split_ratios: [0.3, 0.1, 0.6]   # [train, val, test] ratios
-  split_samples: null              # Alternative: [30, 10] samples per class
-  random_state: 42                 # Random seed for reproducibility
-  print_stats: true                # Print split statistics
-```
-
-#### Preprocessing
-
-```yaml
-preprocessing:
-  dim_reduction_method: "pca"      # "pca", "maxpool", or null
-  num_pca_bands: 30                # Number of PCA components
-  maxpool_kernel: 2                # MaxPool kernel size
-  use_channel_dim: true            # Add channel dimension
-  band_axis: "channels_first"      # "channels_first" or "channels_last"
-  band_indices: null               # Specify band indices (optional)
-```
-
-#### Model Selection
-
-```yaml
-model:
-  name: "DBCTNet"                  # "DBCTNet" or "3DRecNet"
-  run_all_models: false            # Set true to benchmark all models
-  print_summary: true              # Print model architecture
-  summary_only: false              # Skip training (summary only)
-  summary_depth: 10                # Depth of model summary
-```
-
-#### Training Parameters
-
-```yaml
-training:
-  num_epochs: 100                  # Maximum epochs
-  num_runs: 3                      # Number of independent runs
-  batch_size: 64                   # Training batch size
-  learning_rate: 0.002             # Learning rate
-  patience: 100                    # Early stopping patience
-  checkpoint_interval: 10          # Save checkpoint every N epochs
-  num_workers: 4                   # DataLoader workers
-```
-
-#### Device & Visualization
-
-```yaml
-device:
-  use_cuda: true                   # Use CUDA if available
-
-visualization:
-  cmap: "jet"                      # Colormap for visualization
-  show_colorbar: false             # Show colorbar in maps
-  dpi: 600                         # DPI for saved images
-```
-
-## Usage
-
-### 1. Basic Training
-
-```bash
-python main.py
-```
-
-This runs the experiment with default `config/config.yaml` settings.
-
-### 2. Custom Configuration File
-
-```bash
-python main.py config/my_experiment.yaml
-```
-
-Load a custom YAML configuration file.
-
-### 3. Inline Configuration
-
-Edit `main.py` and set:
-
-```python
-USE_INLINE_CONFIG = True
-```
-
-Then modify `INLINE_CONFIG` dictionary directly in the file for quick experimentation.
-
-### 4. Multiple Runs for Statistical Analysis
-
-Set `num_runs: 5` in config to run 5 independent experiments with different random seeds.
-
-### 5. Model Comparison
-
-Set `run_all_models: true` in config to automatically train and compare all available models (DBCTNet, 3DRecNet).
-
-### 6. Summary-Only Mode
-
-Set `summary_only: true` and `print_summary: true` to view model architecture without training.
-
-## Output Structure
-
-After training, results are organized in:
-
-```
-results/
-└── <dataset_name>/
-    └── <model_name>/
-        ├── run_1/
-        │   ├── config.json              # Experiment configuration
-        │   ├── best_model.pth           # Best model checkpoint
-        │   ├── final_model.pth          # Final epoch model
-        │   ├── checkpoint_epoch_10.pth  # Periodic checkpoints
-        │   ├── training_log.txt         # Detailed training logs
-        │   └── classification_map.png   # Full-scene prediction
-        ├── run_2/
-        ├── run_3/
-        └── results_summary.xlsx         # Aggregated metrics
-```
-
-### Results Summary (Excel)
-
-The `results_summary.xlsx` file contains aggregated metrics across all runs:
-
-| Column | Description |
-|--------|-------------|
-| `Run` | Run number |
-| `Epochs` | Total epochs trained |
-| `Best_Epoch` | Epoch with best validation performance |
-| `OA` | Overall Accuracy (%) |
-| `AA` | Average Accuracy (%) |
-| `Kappa` | Cohen's Kappa coefficient |
-| `Class_1_Acc`, `Class_2_Acc`, ... | Per-class accuracies (%) |
-| `Training_Time` | Total training time (HH:MM:SS) |
-
-### Training Log
-
-Detailed `training_log.txt` includes:
-- Epoch-by-epoch metrics (loss, OA, AA, Kappa)
-- Best epoch information
-- Model configuration
-- Dataset statistics
-
-## Adding New Models
-
-To add a custom model:
-
-1. **Create model file**: `models/MyModel.py`
-
-```python
-import torch.nn as nn
-
-class MyModel(nn.Module):
-    def __init__(self, num_classes, input_bands, **kwargs):
-        super(MyModel, self).__init__()
-        # Your model architecture
-        pass
-    
-    def forward(self, x):
-        # Forward pass
-        return x
-```
-
-2. **Edit `main.py`** in `run_single_experiment()` function:
-
-```python
-from models.MyModel import MyModel
-
-# In model initialization section:
-if exp['model_name'] == "MyModel":
-    model = MyModel(
-        num_classes=exp['num_classes'],
-        input_bands=exp['bands'],
-        # ... your parameters
-    )
-```
-
-3. **Update `config.yaml`**:
-
-```yaml
-model:
-  name: "MyModel"
-```
-
-## Workflow Summary
-
-1. **Prepare dataset** in `datasets/<dataset_name>/` with `<name>_data.mat` and `<name>_gt.mat` files
-2. **Configure** `config/config.yaml` (or use inline config in `main.py`)
-   - Set dataset path, model name, hyperparameters
-3. **Run training**: `python main.py`
-4. **Check results** in `results/<dataset_name>/<model_name>/`
-5. **Analyze metrics** in `results_summary.xlsx`
-6. **View** classification maps (`.png` files in each run folder)
-
-## Troubleshooting
-
-### Issue: "Required _data and _gt files not found"
-
-- Ensure filenames end with `_data.mat` and `_gt.mat`
-- Check `config.yaml` has correct `datasets_folder` path
-- Verify dataset directory structure matches expected format
-
-### Issue: "ValueError: Ratios must sum to 1.0"
-
-- Verify `split_ratios` in config sum to 1.0 (e.g., [0.3, 0.1, 0.6])
-- If using `split_samples`, ensure values are valid for your dataset size
-
-### Issue: CUDA out of memory
-
-- Reduce `batch_size` in config
-- Reduce `patch_size` in config
-- Use `dim_reduction_method: "pca"` with fewer bands
-- Reduce `num_pca_bands` or use `maxpool` instead
-
-### Issue: "Unknown model" error
-
-- Check model name in config matches implemented models (DBCTNet, 3DRecNet)
-- Verify model is imported in `main.py`
-- For custom models, ensure they're added to `run_single_experiment()` function
-
-### Issue: Poor classification accuracy
-
-- Check data preprocessing and normalization settings
-- Verify dataset split is balanced across classes
-- Try different `patch_size` values
-- Increase `num_epochs` or adjust `learning_rate`
-- Check `patience` value for early stopping
-
-## Requirements
-
-```
-python >= 3.8
-torch >= 1.10
-torchvision
-numpy
-scipy
-rasterio
-scikit-learn
-matplotlib
-pandas
-tqdm
-openpyxl
-pyyaml
-torchinfo  # Optional: for model summary
-```
+## 🚀 Quick Start
 
 ### Installation
 
 ```bash
-pip install torch torchvision numpy scipy rasterio scikit-learn matplotlib pandas tqdm openpyxl pyyaml
+# Core dependencies
+pip install torch torchvision numpy scipy scikit-learn pandas
+pip install pyyaml huggingface_hub matplotlib pillow tqdm
 
-# Optional (for model summary feature)
-pip install torchinfo
+# For Mamba-based models
+pip install mamba-ssm causal-conv1d
+
+# For model summaries (optional)
+pip install torchinfo timm einops
 ```
 
-## Models
+### Basic Usage
 
-### DBCTNet
-A dual-branch convolutional transformer network combining spatial and spectral features for HSI classification.
+```bash
+# Run with default config
+python main.py
 
-### 3DRecNet (HSIVit)
-A 3D recurrent vision transformer model with hierarchical feature extraction for hyperspectral image analysis.
+# Run with custom config
+python main.py config/my_config.yaml
 
-## License
+# List available models/datasets
+python main.py --list-models
+python main.py --list-datasets
+
+# Run map arrangement only
+python main.py --arrange-only
+
+# Show help
+python main.py --help
+```
+
+---
+
+## 📁 Project Structure
+
+```
+HSI_Pipeline/
+├── config/
+│   ├── config.yaml          # Main configuration (single file for everything)
+│   ├── config_loader.py     # Config loading utility
+│   └── dataset.yaml         # Dataset metadata (24 datasets)
+├── models/                  # 21 model implementations
+│   ├── __init__.py          # Exports: create_model, list_models, InputShapeWrapper
+│   ├── registry.py          # Model registry with @register_model decorator
+│   ├── Ours/                # Custom models (AMMT)
+│   ├── MambaHSI.py          # Mamba-based models
+│   ├── SSFTTnet.py          # Transformer models
+│   └── ...                  # More models
+├── utils/
+│   ├── data_loader.py       # DatasetLoader, HyperspectralDataset
+│   ├── data_split.py        # split_data, split_samples
+│   ├── experiment.py        # setup_experiment
+│   ├── experiment_runner.py # run_single_experiment
+│   ├── trainer.py           # train_model with early stopping
+│   ├── metrics.py           # calculate_metrics, post_training_analysis
+│   ├── visualization.py     # generate_classification_map
+│   ├── map_arranger.py      # MapArranger class
+│   ├── map_arranger_integration.py
+│   └── optimizers.py        # create_optimizer (adam, adamw, sgd, etc.)
+├── results/                 # Output directory (auto-created)
+├── main.py                  # Main entry point
+└── README.md
+```
+
+---
+
+## ⚙️ Complete Configuration Reference
+
+All settings are in `config/config.yaml`:
+
+```yaml
+# ============================================================
+# DATASET
+# ============================================================
+dataset:
+  names: ["Botswana"] # Dataset(s) to run (auto-downloaded)
+  run_all_datasets: False # True = run all 24 datasets
+  patch_size: 11 # Spatial patch size (e.g., 11×11)
+  stride: 1 # Stride for patch extraction
+  verbose: True # Print dataset info
+
+# ============================================================
+# DATA SPLIT
+# ============================================================
+data_split:
+  method: "ratio" # "ratio" or "samples"
+  split_ratios: [0.1, 0.1, 0.8] # [train, val, test] percentages
+  # split_samples: [30, 10]  # Alternative: fixed samples per class
+  random_state: 42 # Random seed
+  print_stats: True # Print split statistics
+
+# ============================================================
+# PREPROCESSING
+# ============================================================
+preprocessing:
+  dim_reduction_method: "pca" # "pca", "maxpool", or null
+  num_pca_bands: 30 # Number of PCA components
+  maxpool_kernel: 2 # Kernel size for maxpool (if used)
+  use_channel_dim: True # Add channel dimension
+  band_indices: null # Specific bands to use (null = all)
+
+# ============================================================
+# MODEL
+# ============================================================
+model:
+  name: ["MambaHSI"] # Model(s) to run
+  run_all_models: False # True = run all 21 models
+  print_summary: False # Print model architecture
+  summary_only: False # Only print summary, skip training
+  summary_depth: 4 # Depth of model summary
+
+# ============================================================
+# TRAINING
+# ============================================================
+training:
+  num_epochs: 100 # Training epochs
+  num_runs: 3 # Runs per model (for averaging)
+  batch_size: 32 # Batch size
+  learning_rate: 0.001 # Learning rate
+  optimizer: "adam" # adam, adamw, sgd, rmsprop, adagrad, adadelta
+  optimizer_params: {} # Extra params (weight_decay, momentum, etc.)
+  patience: 10 # Early stopping patience
+  checkpoint_interval: 10 # Save checkpoint every N epochs
+  num_workers: 8 # DataLoader workers
+
+# ============================================================
+# DEVICE
+# ============================================================
+device:
+  use_cuda: True # Use GPU if available
+
+# ============================================================
+# VISUALIZATION
+# ============================================================
+visualization:
+  cmap: "jet" # Colormap: jet, viridis, tab20, etc.
+  block_background: True # Black background for unlabeled pixels
+  show_colorbar: False # Show colorbar on map
+  dpi: 300 # Image resolution
+
+# ============================================================
+# MAP ARRANGEMENT (for figure grids)
+# ============================================================
+map_arrangement:
+  enabled: False # Auto-run after training
+  base_output_dir: "results"
+  dataset_dir: "Botswana"
+
+  # Model Selection
+  all_models: False # True = auto-discover all models
+  models: ["MambaHSI", "SSMamba", "AMMT"]
+  map_type: ["best", "best", "best"] # best, worst, or threshold
+  metric: ["OA", "OA", "OA"] # OA, AA, Kappa
+
+  # Visualization
+  visualization:
+    cmap: "jet"
+    block_background: True
+    include_gt: False # Include ground truth map
+    regenerate_maps: False # Force regenerate from checkpoints
+
+  # Layout
+  layout:
+    rows: 2
+    cols: 2
+    gap: 20 # Column gap (%)
+    row_gap: 30 # Row gap (%)
+    orientation: "horizontal"
+
+  # Labels
+  labels:
+    fontsize: 16
+    position: "top" # top, bottom, left, right
+    alignment: "center"
+
+  # Output
+  output:
+    dpi: 300
+    path: null # Custom output path
+```
+
+---
+
+## 🧠 Available Models (21)
+
+AMMT, MambaHSI, MambaHSI_Plus, SSMamba, S2Mamba, SSFTTNet, SpectralFormer, MorphFormer, MFT, GAHT, MASSFormer, 3DConvSST, DBCTNet, GTCFN, FAHM, GSCViT, HybridSN, 3DRecNet, SACNet, S3ANet, MCTGCL
+
+```bash
+# List all models with details
+python main.py --list-models
+```
+
+---
+
+## 📊 Available Datasets (24)
+
+| Dataset          | Size      | Bands | Classes |
+| ---------------- | --------- | ----- | ------- |
+| Indian_Pines     | 200×145   | 145   | 16      |
+| Pavia University | 610×340   | 103   | 9       |
+| Pavia Center     | 1096×715  | 102   | 9       |
+| Botswana         | 1476×256  | 145   | 14      |
+| KSC              | 512×614   | 176   | 13      |
+| Salinas          | 512×217   | 204   | 16      |
+| Houston13        | 954×210   | 48    | 7       |
+| Houston18        | 349×1905  | 144   | 15      |
+| Trento           | 166×600   | 63    | 6       |
+| Berlin           | 1723×476  | 244   | 8       |
+| Augsburg         | 332×485   | 180   | 7       |
+| WHU-Hi-LongKou   | 550×400   | 270   | 9       |
+| WHU-Hi-HanChuan  | 1217×303  | 274   | 16      |
+| WHU-Hi-HongHu    | 940×475   | 270   | 22      |
+| Dioni            | 250×1376  | 176   | 12      |
+| Loukia           | 249×945   | 176   | 14      |
+| Muufl            | 325×220   | 64    | 11      |
+| Utopia           | 478×595   | 432   | 9       |
+| Holden           | 595×440   | 418   | 6       |
+| NiliFossae       | 478×593   | 425   | 9       |
+| Qingyun          | 880×1360  | 176   | 6       |
+| Pingan           | 1230×1000 | 176   | 10      |
+| Tangdaowan       | 1740×860  | 176   | 18      |
+
+---
+
+## 📂 Output Structure
+
+```
+results/
+└── Botswana/
+    └── MambaHSI/
+        ├── results_summary.csv          # All runs summary
+        └── run_1/
+            ├── config.yaml              # Run configuration
+            ├── best_model.pth           # Best checkpoint (by val accuracy)
+            ├── final_model.pth          # Final epoch checkpoint
+            ├── checkpoint_epoch_90.pth  # Periodic checkpoint
+            ├── classification_map_jet.png   # Map with colormap name
+            ├── classification_map.png       # Generic map (backward compat)
+            └── training.log             # Training log
+```
+
+---
+
+## 🎯 Example Workflows
+
+### Quick Test (Single Model, Single Dataset)
+
+```yaml
+dataset:
+  names: ["Indian_Pines"]
+model:
+  name: ["MambaHSI"]
+training:
+  num_epochs: 10
+  num_runs: 1
+```
+
+### Benchmark (Multiple Models × Datasets)
+
+```yaml
+dataset:
+  names: ["Botswana", "Indian_Pines", "Houston13"]
+model:
+  name: ["AMMT", "MambaHSI", "SSMamba", "SSFTTNet"]
+training:
+  num_epochs: 100
+  num_runs: 5
+```
+
+### Run All Models on One Dataset
+
+```yaml
+dataset:
+  names: ["Botswana"]
+model:
+  run_all_models: True
+training:
+  num_runs: 3
+```
+
+### Run All Datasets with One Model
+
+```yaml
+dataset:
+  run_all_datasets: True
+model:
+  name: ["MambaHSI"]
+training:
+  num_runs: 3
+```
+
+---
+
+## 🎨 Map Arrangement
+
+Create publication-ready figure grids:
+
+```bash
+# Run map arrangement only
+python main.py --arrange-only
+```
+
+### Smart Colormap Handling
+
+- **Existing maps**: If `classification_map_{cmap}.png` exists, it's reused
+- **New colormap**: If different colormap requested, regenerates from checkpoint
+- **Backward compatible**: Also saves generic `classification_map.png`
+
+---
+
+## 🔧 Adding New Models
+
+1. Create model file in `models/`:
+
+```python
+# models/my_model.py
+import torch.nn as nn
+from .registry import register_model
+
+class MyModel(nn.Module):
+    def __init__(self, num_classes, bands, patch_size, **kwargs):
+        super().__init__()
+        # ... model architecture
+
+    def forward(self, x):
+        # ... forward pass
+        return x
+
+@register_model('MyModel', expects_4d=True)  # Set expects_4d if model needs 4D input
+def my_model(pretrained=False, **kwargs):
+    return MyModel(**kwargs)
+```
+
+2. Model is auto-discovered and available immediately!
+
+---
+
+## 📈 Data Flow
+
+```
+main.py
+  ├── load_config() → Config object
+  ├── get_datasets_to_run() → dataset names
+  ├── get_models_to_run() → model names
+  └── run_single_experiment()
+        ├── setup_experiment()
+        │     ├── DatasetLoader.load_dataset() → HuggingFace download
+        │     ├── HyperspectralDataset() → patches + preprocessing
+        │     ├── split_data() / split_samples()
+        │     └── DataLoader creation
+        ├── create_model() + InputShapeWrapper (if 4D)
+        ├── train_model()
+        │     ├── create_optimizer()
+        │     └── training loop + early stopping
+        └── post_training_analysis()
+              ├── calculate_metrics() → OA, AA, Kappa
+              ├── generate_classification_map()
+              └── update_results_csv()
+```
+
+---
+
+## 📝 License
 
 MIT License
 
-## Contact
+---
 
-For issues, questions, or suggestions, please open an issue on [GitHub](https://github.com/Tanishq251/HSI_Pipeline/issues).
+## 🙏 Acknowledgments
+
+- [Hugging Face](https://huggingface.co/) for dataset hosting
+- [Mamba-SSM](https://github.com/state-spaces/mamba) authors
+- All original model authors
+
+---
+
+**Happy Experimenting! 🚀**

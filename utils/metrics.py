@@ -51,7 +51,7 @@ def post_training_analysis(trained_model, predictions, targets, best_epoch, trai
                            dataset, device, run_dir, dataset_name, model_name, run_number,
                            num_epochs, patch_size, batch_size, split_ratios, split_samples_count,
                            train_idx, val_idx, test_idx, num_classes, cmap='tab20',
-                           show_colorbar=False, dpi=300):
+                           show_colorbar=False, dpi=300, block_background=True):
     """Perform complete post-training analysis"""
     
     from utils.visualization import generate_classification_map
@@ -70,7 +70,8 @@ def post_training_analysis(trained_model, predictions, targets, best_epoch, trai
         run_number=run_number,
         cmap=cmap,
         show_colorbar=show_colorbar,
-        dpi=dpi
+        dpi=dpi,
+        block_background=block_background
     )
     
     # Prepare results dictionary

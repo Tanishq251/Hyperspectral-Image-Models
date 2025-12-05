@@ -1,259 +1,110 @@
-import torch
-from utils.experiment import setup_experiment
-from utils.trainer import train_model
-from utils.metrics import post_training_analysis
-from models.DBCTnet import DBCTNet
-from models.M3DRecNet import HSIVit
+"""
+Main entry point for HSI classification pipeline
+"""
+
+import sys
+import warnings
+
+# Suppress deprecation warnings from third-party libraries
+warnings.filterwarnings('ignore', category=UserWarning, module='pyramid.path')
+warnings.filterwarnings('ignore', category=FutureWarning, module='timm.models.layers')
+
 from config.config_loader import load_config
+from utils.experiment_runner import run_single_experiment
+from utils.data_loader import DatasetLoader
+from models import list_models
 
 
-
-# Set USE_INLINE_CONFIG = True to use settings below instead of config.yaml
-USE_INLINE_CONFIG = True
-
-INLINE_CONFIG = {
-    'dataset': {
-        'datasets_folder': 'datasets',
-        'use_all': False,
-        'names': ['WHU-Hi-HanChuan'],
-        'patch_size': 11,
-        'stride': 1,
-        'verbose': True
-    },
-    'data_split': {
-        'method': 'ratio',
-        'split_ratios': [0.3, 0.1, 0.6],
-        'split_samples': None,
-        'random_state': 42,
-        'print_stats': True
-    },
-    'preprocessing': {
-        'dim_reduction_method': 'pca',
-        'num_pca_bands': 30,
-        'maxpool_kernel': 2,
-        'use_channel_dim': True,
-        'band_axis': 'channels_first',
-        'band_indices': None
-    },
-    'model': {
-        'name': 'DBCTNet',
-        'run_all_models': False,
-        'print_summary': True,
-        'summary_only': False,
-        'summary_depth': 10
-    },
-    'training': {
-        'num_epochs': 100,
-        'num_runs': 3,
-        'batch_size': 64,
-        'learning_rate': 0.002,
-        'patience': 100,
-        'checkpoint_interval': 10,
-        'num_workers': 4
-    },
-    'device': {
-        'use_cuda': True
-    },
-    'visualization': {
-        'cmap': 'jet',
-        'show_colorbar': False,
-        'dpi': 600
-    }
-}
-
-
-class InlineConfig:
-    """Simple config class for inline dictionary configuration"""
-    def __init__(self, config_dict):
-        self.config = config_dict
+def get_datasets_to_run(cfg):
+    """Determine which datasets to run based on config"""
+    run_all_datasets = cfg.get('dataset.run_all_datasets', False)
     
-    def get(self, key, default=None):
-        keys = key.split('.')
-        value = self.config
-        for k in keys:
-            if isinstance(value, dict):
-                value = value.get(k, default)
-            else:
-                return default
-        return value
-    
-    def __getitem__(self, key):
-        return self.get(key)
-    
-    def to_dict(self):
-        return self.config
-# ============================================================================
-
-
-def print_model_summary(model, input_shape, device='cuda'):
-    """Print model summary using torchinfo"""
-    try:
-        from torchinfo import summary
-        
-        print("\n" + "="*60)
-        print("Model Summary")
-        print("="*60)
-        
-        summary(
-            model,
-            input_size=input_shape,
-            col_names=["input_size", "output_size", "num_params", "mult_adds"],
-            depth=10,
-            device=device
-        )
-        
-        print("="*60 + "\n")
-    except ImportError:
-        print("Warning: torchinfo not installed. Install with: pip install torchinfo")
-
-
-def run_single_experiment(cfg, model_name=None, run_number=None, dataset_name=None):
-    """Run a single experiment with specified model, run number, and dataset"""
-    
-    # Override model name if provided
-    if model_name:
-        cfg.config['model']['name'] = model_name
-    
-    # Setup experiment: dataset, dataloaders, run directory
-    exp = setup_experiment(cfg, run_number=run_number, dataset_name=dataset_name)
-    
-    # Device configuration
-    use_cuda = cfg.get('device.use_cuda', True)
-    device = 'cuda' if (torch.cuda.is_available() and use_cuda) else 'cpu'
-    
-    # Model initialization
-    if exp['model_name'] == "DBCTNet":
-        model = DBCTNet(
-            channels=16,
-            patch=exp['patch_size'],
-            bands=exp['bands'],
-            num_class=exp['num_classes'],
-            fc_dim=16,
-            heads=2,
-            drop=0.1
-        )
-    elif exp['model_name'] == "3DRecNet":
-        model = HSIVit(
-            in_chans=1,
-            num_classes=exp['num_classes'],
-            depths=[3, 3, 9, 3],
-            dims=[32, 64, 128, 256],
-            drop_path_rate=0.05,
-            layer_scale_init_value=1e-6
-        )
+    if run_all_datasets:
+        # Load all dataset names from dataset.yaml
+        import yaml
+        from pathlib import Path
+        dataset_yaml_path = Path("config/dataset.yaml")
+        if dataset_yaml_path.exists():
+            with open(dataset_yaml_path, 'r') as f:
+                dataset_config = yaml.safe_load(f)
+            datasets_to_run = list(dataset_config.get('datasets', {}).keys())
+        else:
+            raise FileNotFoundError("dataset.yaml not found. Cannot run all datasets.")
     else:
-        raise ValueError(f"Unknown model: {exp['model_name']}. Supported: DBCTNet, 3DRecNet")
-    
-    # Print model summary if requested
-    print_summary = cfg.get('model.print_summary', False)
-    summary_only = cfg.get('model.summary_only', False)
-    
-    if print_summary:
-        sample_input, _ = exp['dataset'][0]
-        input_shape = (exp['batch_size'],) + tuple(sample_input.shape)
-        print_model_summary(model, input_shape, device)
-    
-    # If summary_only mode, skip training
-    if summary_only:
-        print("\n" + "="*60)
-        print("Summary-only mode enabled. Skipping training.")
-        print("="*60)
-        return
-    
-    # Training parameters
-    num_epochs = cfg.get('training.num_epochs', 50)
-    learning_rate = cfg.get('training.learning_rate', 0.001)
-    patience = cfg.get('training.patience', 10)
-    checkpoint_interval = cfg.get('training.checkpoint_interval', 10)
-    
-    # Train model
-    trained_model, predictions, targets, best_epoch, training_time = train_model(
-        model=model,
-        train_loader=exp['train_loader'],
-        val_loader=exp['val_loader'],
-        test_loader=exp['test_loader'],
-        num_epochs=num_epochs,
-        learning_rate=learning_rate,
-        device=device,
-        patience=patience,
-        run_dir=exp['run_dir'],
-        checkpoint_interval=checkpoint_interval
-    )
-    
-    # Visualization parameters
-    cmap = cfg.get('visualization.cmap', 'tab20')
-    show_colorbar = cfg.get('visualization.show_colorbar', False)
-    dpi = cfg.get('visualization.dpi', 300)
-    
-    # Post-training analysis: metrics, classification map, CSV
-    post_training_analysis(
-        trained_model=trained_model,
-        predictions=predictions,
-        targets=targets,
-        best_epoch=best_epoch,
-        training_time=training_time,
-        dataset=exp['dataset'],
-        device=device,
-        run_dir=exp['run_dir'],
-        dataset_name=exp['dataset_name'],
-        model_name=exp['model_name'],
-        run_number=exp['run_number'],
-        num_epochs=num_epochs,
-        patch_size=exp['patch_size'],
-        batch_size=exp['batch_size'],
-        split_ratios=exp['split_ratios'],
-        split_samples_count=exp['split_samples_count'],
-        train_idx=exp['train_idx'],
-        val_idx=exp['val_idx'],
-        test_idx=exp['test_idx'],
-        num_classes=exp['num_classes'],
-        cmap=cmap,
-        show_colorbar=show_colorbar,
-        dpi=dpi
-    )
-
-
-def main(config_path="config/config.yaml"):
-    """Main entry point for training"""
-    
-    # Load configuration: inline dict or YAML file
-    if USE_INLINE_CONFIG:
-        print("Using INLINE_CONFIG from main.py")
-        cfg = InlineConfig(INLINE_CONFIG)
-    else:
-        print(f"Loading config from: {config_path}")
-        cfg = load_config(config_path)
-    
-    # Get configuration for multiple runs, models, and datasets
-    num_runs = cfg.get('training.num_runs', 1)
-    run_all_models = cfg.get('model.run_all_models', False)
-    use_all_datasets = cfg.get('dataset.use_all', False)
-    
-    # Determine which datasets to run
-    if use_all_datasets:
-        from utils.data_loader import DatasetLoader
-        datasets_folder = cfg.get('dataset.datasets_folder', 'datasets')
-        loader = DatasetLoader(datasets_folder)
-        datasets_to_run = list(loader.available_datasets.keys())
-        print(f"Running on ALL datasets: {datasets_to_run}")
-    else:
-        datasets_to_run = cfg.get('dataset.names', ['WHU-Hi-HanChuan'])
+        datasets_to_run = cfg.get('dataset.names', [])
+        
         if isinstance(datasets_to_run, str):
             datasets_to_run = [datasets_to_run]
-        print(f"Running on specified datasets: {datasets_to_run}")
     
-    # Determine which models to run
+    if not datasets_to_run:
+        raise ValueError("No datasets specified in config. Please provide dataset.names or set run_all_datasets: True")
+    
+    print(f"Datasets to run ({len(datasets_to_run)}): {', '.join(datasets_to_run)}")
+    print("(Datasets will be automatically downloaded to cache if not present)")
+    
+    return datasets_to_run
+
+
+def get_models_to_run(cfg):
+    """Determine which models to run based on config"""
+    run_all_models = cfg.get('model.run_all_models', False)
+    
     if run_all_models:
-        models_to_run = ["DBCTNet", "3DRecNet"]
-        print(f"Running all models: {models_to_run}")
+        models_to_run = list_models()
     else:
-        models_to_run = [cfg.get('model.name', 'DBCTNet')]
-        print(f"Running single model: {models_to_run[0]}")
+        model_name_cfg = cfg.get('model.name', '')
+        if isinstance(model_name_cfg, list):
+            models_to_run = model_name_cfg
+        else:
+            models_to_run = [m.strip() for m in model_name_cfg.split(',')]
+        models_to_run = [m for m in models_to_run if m]
+    
+    return models_to_run
+
+
+def run_map_arrangement_only(cfg):
+    """Run map arrangement without training"""
+    print("\n" + "="*60)
+    print("Map Arrangement Only Mode")
+    print("="*60 + "\n")
+    
+    from utils.map_arranger_integration import arrange_maps_after_training
+    
+    dataset_name = cfg.get('map_arrangement.dataset_dir', 'Utopia')
+    models_cfg = cfg.get('map_arrangement.models', [])
+    
+    if isinstance(models_cfg, dict):
+        models = list(models_cfg.keys())
+    else:
+        models = models_cfg if isinstance(models_cfg, list) else []
+    
+    if not models:
+        print("Error: No models specified in map_arrangement config")
+        return
+    
+    # force_run=True to bypass the enabled check for --arrange-only mode
+    arrange_maps_after_training(cfg, dataset_name, models, force_run=True)
+
+
+def main(config_path="config/config.yaml", arrange_only=False):
+    """Main entry point for training pipeline"""
+    
+    print(f"Loading config from: {config_path}")
+    cfg = load_config(config_path)
+    
+    if arrange_only:
+        run_map_arrangement_only(cfg)
+        return
+    
+    # Get configuration
+    num_runs = cfg.get('training.num_runs', 1)
+    datasets_to_run = get_datasets_to_run(cfg)
+    models_to_run = get_models_to_run(cfg)
     
     print(f"Number of runs per model: {num_runs}")
     print("-" * 60)
     
-    # Run experiments for each dataset, model, and run
+    # Run experiments
     total_experiments = len(datasets_to_run) * len(models_to_run) * num_runs
     current_experiment = 0
     
@@ -275,7 +126,7 @@ def main(config_path="config/config.yaml"):
                     run_single_experiment(
                         cfg, 
                         model_name=model_name, 
-                        run_number=run_num,
+                        run_number=None,
                         dataset_name=dataset_name
                     )
                     print(f"\n✓ Completed: {dataset_name} | {model_name} | Run {run_num}/{num_runs}\n")
@@ -290,9 +141,98 @@ def main(config_path="config/config.yaml"):
     print("All experiments completed!")
     print(f"Total experiments run: {current_experiment}/{total_experiments}")
     print(f"{'='*60}")
+    
+    # Optionally arrange maps after training
+    if cfg.get('map_arrangement.enabled', False):
+        from utils.map_arranger_integration import arrange_maps_after_training
+        for dataset_name in datasets_to_run:
+            arrange_maps_after_training(cfg, dataset_name, models_to_run)
+
+
+def list_available_models():
+    """List all available models"""
+    from models import list_models, get_model_config
+    
+    models = list_models()
+    print(f"\n{'='*60}")
+    print(f"Available Models ({len(models)})")
+    print(f"{'='*60}")
+    print(f"{'Model Name':<25} {'4D Input':<10} {'Notes'}")
+    print(f"{'-'*60}")
+    for name in sorted(models):
+        cfg = get_model_config(name)
+        expects_4d = 'Yes' if cfg.get('expects_4d', False) else 'No'
+        notes = ''
+        if name == 'GSCViT':
+            notes = 'Requires 8x8 patch'
+        print(f"{name:<25} {expects_4d:<10} {notes}")
+    print(f"{'='*60}\n")
+
+
+def list_available_datasets():
+    """List all available datasets"""
+    from utils.data_loader import DatasetLoader
+    
+    loader = DatasetLoader(use_cache=True)
+    datasets = loader.list_available_datasets()
+    print(f"\n{'='*60}")
+    print(f"Available Datasets ({len(datasets)})")
+    print(f"{'='*60}")
+    for i, name in enumerate(sorted(datasets), 1):
+        print(f"  {i:2d}. {name}")
+    print(f"{'='*60}")
+    print(f"Datasets are auto-downloaded from HuggingFace Hub")
+    print(f"Cache location: ~/.cache/huggingface/")
+    print(f"{'='*60}\n")
+
+
+def print_help():
+    """Print help message"""
+    print("""
+Hyperspectral Image Classification Framework
+=============================================
+
+Usage:
+  python main.py [config_file] [options]
+
+Options:
+  --list-models      List all available models
+  --list-datasets    List all available datasets
+  --arrange-only     Run map arrangement only (no training)
+  --help, -h         Show this help message
+
+Examples:
+  python main.py                          # Run with default config
+  python main.py config/my_config.yaml    # Run with custom config
+  python main.py --list-models            # List available models
+  python main.py --list-datasets          # List available datasets
+  python main.py --arrange-only           # Arrange maps only
+""")
 
 
 if __name__ == "__main__":
-    import sys
-    config_file = sys.argv[1] if len(sys.argv) > 1 else "config/config.yaml"
-    main(config_file)
+    config_file = "config/config.yaml"
+    arrange_only = False
+    
+    # Parse arguments
+    args = sys.argv[1:]
+    
+    if '--help' in args or '-h' in args:
+        print_help()
+        sys.exit(0)
+    
+    if '--list-models' in args:
+        list_available_models()
+        sys.exit(0)
+    
+    if '--list-datasets' in args:
+        list_available_datasets()
+        sys.exit(0)
+    
+    for arg in args:
+        if arg == "--arrange-only":
+            arrange_only = True
+        elif not arg.startswith("--"):
+            config_file = arg
+    
+    main(config_file, arrange_only=arrange_only)

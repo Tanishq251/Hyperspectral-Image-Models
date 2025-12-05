@@ -6,22 +6,35 @@ import torch.optim as optim
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from tqdm import tqdm
 import numpy as np
-from sklearn.metrics import accuracy_score
+from utils.metrics import calculate_metrics
+from utils.optimizers import create_optimizer
 
 
 def train_model(model, train_loader, val_loader, test_loader, num_epochs=50,
                 learning_rate=0.001, device='cuda', patience=10, run_dir=None, 
-                checkpoint_interval=10):
+                checkpoint_interval=10, optimizer_name='adam', optimizer_params=None):
     """Train the model with optional validation and early stopping"""
     
     model = model.to(device)
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    
+    # Create optimizer with specified parameters
+    if optimizer_params is None:
+        optimizer_params = {}
+    
+    optimizer = create_optimizer(
+        model,
+        optimizer_name=optimizer_name,
+        learning_rate=learning_rate,
+        **optimizer_params
+    )
     
     if val_loader is not None:
+        # Scheduler still monitors loss for smooth reduction, which is standard practice
         scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5)
     
-    best_val_loss = float('inf')
+    # MODIFICATION 1: Track best Accuracy instead of Loss
+    best_val_acc = 0.0
     best_model_state = None
     epochs_without_improvement = 0
     best_epoch = 0
@@ -31,7 +44,10 @@ def train_model(model, train_loader, val_loader, test_loader, num_epochs=50,
     
     print(f"\n{'='*60}")
     print(f"Training on: {device}")
+    print(f"Optimizer: {optimizer_name.upper()}")
+    print(f"Learning Rate: {learning_rate}")
     print(f"Using validation: {'Yes' if val_loader is not None else 'No'}")
+    print(f"Saving best model based on: Validation Accuracy")
     print(f"{'='*60}\n")
     
     for epoch in range(num_epochs):
@@ -91,10 +107,14 @@ def train_model(model, train_loader, val_loader, test_loader, num_epochs=50,
             val_loss /= len(val_loader)
             val_acc = 100. * val_correct / val_total
             
+            # Step scheduler based on loss (standard practice for optimization)
             scheduler.step(val_loss)
             
-            if val_loss < best_val_loss:
-                best_val_loss = val_loss
+            # MODIFICATION 2: Save Best Model based on ACCURACY
+            # We use > instead of <, and update best_val_acc
+            if val_acc > best_val_acc:
+                print(f"  New best accuracy: {val_acc:.2f}% (was {best_val_acc:.2f}%)")
+                best_val_acc = val_acc
                 best_model_state = model.state_dict().copy()
                 best_epoch = epoch + 1
                 epochs_without_improvement = 0
@@ -119,16 +139,13 @@ def train_model(model, train_loader, val_loader, test_loader, num_epochs=50,
             
             if epochs_without_improvement >= patience:
                 print(f"\nEarly stopping triggered! No improvement for {patience} epochs.")
-                print("Restoring best model...")
-                model.load_state_dict(best_model_state)
                 break
         else:
-            if train_loss < best_val_loss:
-                best_val_loss = train_loss
-                best_model_state = model.state_dict().copy()
-                best_epoch = epoch + 1
-                if run_dir:
-                    save_model(model, run_dir, 'best_model', verbose=False)
+            # If no validation set, just save the latest as best
+            best_model_state = model.state_dict().copy()
+            best_epoch = epoch + 1
+            if run_dir:
+                save_model(model, run_dir, 'best_model', verbose=False)
             
             log_entry = {
                 'epoch': epoch + 1,
@@ -146,11 +163,18 @@ def train_model(model, train_loader, val_loader, test_loader, num_epochs=50,
     training_time = time.time() - start_time
     
     if run_dir:
+        # Save the very last state as final_model
         save_model(model, run_dir, 'final_model', verbose=True)
+    
+    # MODIFICATION 3: Explicitly load best model for testing
+    # This ensures we test on the best epoch, not the last ran epoch
+    print(f"\nReloading best model from epoch {best_epoch} for testing...")
+    if best_model_state is not None:
+        model.load_state_dict(best_model_state)
     
     # Test evaluation
     print(f"\n{'='*60}")
-    print("Evaluating on test set...")
+    print("Evaluating on test set (Using Best Model)...")
     print(f"{'='*60}\n")
     
     model.eval()
@@ -176,25 +200,18 @@ def train_model(model, train_loader, val_loader, test_loader, num_epochs=50,
                 'acc': f'{100. * test_correct / test_total:.2f}%'
             })
     
-    test_acc = 100. * test_correct / test_total
-    
-    # Calculate class-wise accuracies
+    # Use the centralized metrics calculator
     num_classes = len(set(all_targets))
-    class_wise_acc = []
-    for class_id in range(num_classes):
-        mask = np.array(all_targets) == class_id
-        if mask.sum() > 0:
-            class_acc = accuracy_score(np.array(all_targets)[mask], np.array(all_preds)[mask]) * 100
-            class_wise_acc.append((class_id, class_acc, mask.sum()))
-        else:
-            class_wise_acc.append((class_id, 0.0, 0))
-    
-    print(f"\nTest Accuracy: {test_acc:.2f}%")
+    oa, aa, kappa, per_class_acc = calculate_metrics(all_preds, all_targets, num_classes)
+
+    print(f"\nOverall Test Accuracy (OA): {oa:.2f}%")
+    print(f"Average Test Accuracy (AA): {aa:.2f}%")
+    print(f"Kappa: {kappa:.4f}")
     print(f"\n{'='*60}")
     print("Class-wise Test Accuracies:")
     print(f"{'='*60}")
-    for class_id, acc, count in class_wise_acc:
-        print(f"Class {class_id+1}: {acc:.2f}% ({count} samples)")
+    for i, acc in enumerate(per_class_acc):
+        print(f"Class {i+1}: {acc:.2f}%")
     print(f"{'='*60}\n")
     
     # Save training log
@@ -207,19 +224,21 @@ def train_model(model, train_loader, val_loader, test_loader, num_epochs=50,
             for entry in training_log:
                 f.write(str(entry) + '\n')
             f.write("\n" + "="*60 + "\n")
-            f.write("Test Results\n")
+            f.write(f"Test Results (Best Model from Epoch {best_epoch})\n")
             f.write("="*60 + "\n")
-            f.write(f"Overall Test Accuracy: {test_acc:.2f}%\n\n")
+            f.write(f"Overall Test Accuracy (OA): {oa:.2f}%\n")
+            f.write(f"Average Test Accuracy (AA): {aa:.2f}%\n")
+            f.write(f"Kappa: {kappa:.4f}\n\n")
             f.write("Class-wise Test Accuracies:\n")
             f.write("-"*60 + "\n")
-            for class_id, acc, count in class_wise_acc:
-                f.write(f"Class {class_id+1}: {acc:.2f}%\n")
+            for i, acc in enumerate(per_class_acc):
+                f.write(f"Class {i+1}: {acc:.2f}%\n")
             f.write("="*60 + "\n")
         
         print(f"\n{'='*60}")
         print("Models & Logs Saved:")
         print(f"{'='*60}")
-        print(f"✓ best_model.pth (epoch {best_epoch})")
+        print(f"✓ best_model.pth (epoch {best_epoch}, Acc: {best_val_acc:.2f}%)")
         print(f"✓ final_model.pth")
         
         checkpoints = [f for f in os.listdir(run_dir) if f.startswith('checkpoint_epoch_')]
@@ -248,3 +267,25 @@ def save_model(model, run_dir, name='best_model', verbose=True):
     torch.save(model.state_dict(), model_path)
     if verbose:
         print(f"✓ Model saved: {name}.pth")
+
+
+def print_model_summary(model, input_shape, device='cuda', depth=4):
+    """Print model summary using torchinfo"""
+    try:
+        from torchinfo import summary
+        
+        print("\n" + "="*60)
+        print("Model Summary")
+        print("="*60)
+        
+        summary(
+            model,
+            input_size=input_shape,
+            col_names=["input_size", "output_size", "num_params", "mult_adds"],
+            depth=depth,
+            device=device
+        )
+        
+        print("="*60 + "\n")
+    except ImportError:
+        print("Warning: torchinfo not installed. Install with: pip install torchinfo")

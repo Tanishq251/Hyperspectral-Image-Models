@@ -1,48 +1,116 @@
-# Hyperspectral Image Classification Configuration
+# ============================================================
+# Hyperspectral Image Classification - Configuration
+# ============================================================
 
+# ------------------------------------------------------------
+# DATASET
+# ------------------------------------------------------------
 dataset:
-  datasets_folder: "datasets" # Root folder containing all datasets
-  use_all: False # Set to True to run on all datasets in the folder
-  names: ["WHU-Hi-HanChuan"] # List of dataset names to use (ignored if use_all is True)
-  patch_size: 11
-  stride: 1
-  verbose: True # Print dataset loading info
+  names: ["Botswana"] # Dataset names (auto-downloaded from HuggingFace)
+  run_all_datasets: False # True = run all available datasets (use --list-datasets to see all)
+  patch_size: 11 # Spatial patch size (e.g., 11x11)
+  stride: 1 # Stride for patch extraction
+  verbose: True # Print dataset info
 
+# ------------------------------------------------------------
+# DATA SPLIT
+# ------------------------------------------------------------
 data_split:
   method: "ratio" # "ratio" or "samples"
-  split_ratios: [0.3, 0.1, 0.6] #[0.3, 0.1, 0.8]  # [train, val, test]
-  split_samples: null # [30, 10] for sample-based split
-  random_state: 42
-  print_stats: True # Print dataset split statistics
+  split_ratios: [0.1, 0.1, 0.8] # [train, val, test] percentages
+  # split_samples: [30, 10]     # Alternative: fixed samples per class [train, val]
+  random_state: 42 # Random seed
+  print_stats: True # Print split statistics
 
+# ------------------------------------------------------------
+# PREPROCESSING
+# ------------------------------------------------------------
 preprocessing:
   dim_reduction_method: "pca" # "pca", "maxpool", or null
-  num_pca_bands: 30
-  maxpool_kernel: 2
-  use_channel_dim: true
-  band_axis: "channels_first" # "channels_first" or "channels_last"
-  band_indices: null
+  num_pca_bands: 30 # Number of PCA components
+  maxpool_kernel: 2 # Kernel size for maxpool reduction (if used)
+  use_channel_dim: True # Add channel dimension
+  band_indices: null # Specific band indices to use (null = all bands)
 
+# ------------------------------------------------------------
+# MODEL
+# ------------------------------------------------------------
 model:
-  name: "DBCTNet" # "DBCTNet" "3DRecNet"
-  run_all_models: False # Set to true to run all available models
-  print_summary: True # Print model summary using torchinfo
-  summary_only: False # Set to True to ONLY print summary and skip training
-  summary_depth: 10 # Depth for model summary
+  name: ["MambaHSI"] # Model(s) to run (use --list-models to see all)
+  run_all_models: False # True = run all available models
+  print_summary: False # Print model architecture
+  summary_only: False # Only print summary, skip training
+  summary_depth: 4 # Depth of model summary (if print_summary=True)
 
+# ------------------------------------------------------------
+# TRAINING
+# ------------------------------------------------------------
 training:
-  num_epochs: 100
-  num_runs: 3
-  batch_size: 64
-  learning_rate: 0.002
-  patience: 100
-  checkpoint_interval: 10
-  num_workers: 4
+  num_epochs: 100 # Training epochs
+  num_runs: 3 # Runs per model (for averaging results)
+  batch_size: 32 # Batch size
+  learning_rate: 0.001 # Learning rate
+  optimizer: "adam" # adam, adamw, sgd, rmsprop, adagrad, adadelta
+  optimizer_params: {} # Additional optimizer params (e.g., weight_decay, momentum)
+  patience: 10 # Early stopping patience
+  checkpoint_interval: 10 # Save checkpoint every N epochs
+  num_workers: 8 # DataLoader workers
 
+# ------------------------------------------------------------
+# DEVICE
+# ------------------------------------------------------------
 device:
-  use_cuda: true # Set to false to force CPU
+  use_cuda: True # Use GPU if available
 
+# ------------------------------------------------------------
+# VISUALIZATION (for classification maps)
+# ------------------------------------------------------------
 visualization:
-  cmap: "jet"
-  show_colorbar: false # Show colorbar legend
-  dpi: 600 # Image resolution
+  cmap: "jet" # Colormap: jet, viridis, tab20, etc.
+  block_background: True # Black background for unlabeled pixels
+  show_colorbar: False # Show colorbar on classification map
+  dpi: 300 # Image resolution
+
+# ============================================================
+# MAP ARRANGEMENT (for creating figure grids)
+# ============================================================
+# Run with: python main.py --arrange-only
+
+map_arrangement:
+  enabled: False # Auto-run after training
+
+  # Source
+  base_output_dir: "results" # Results directory
+  dataset_dir: "Botswana" # Dataset to arrange
+
+  # Model Selection
+  all_models: False # True = auto-discover all models
+  models: ["MambaHSI", "SSMamba", "AMMT"] # Models to include
+  map_type: ["best", "best", "best"] # best, worst, or threshold (e.g., 97.5)
+  metric: ["OA", "OA", "OA"] # OA, AA, Kappa
+
+  # Visualization
+  visualization:
+    cmap: "jet" # Colormap for maps
+    block_background: True # Black background
+    include_gt: False # Include ground truth map
+    regenerate_maps: False # Force regenerate from checkpoints
+
+  # Layout
+  layout:
+    rows: 2 # Grid rows
+    cols: 2 # Grid columns
+    gap: 20 # Column gap (%)
+    row_gap: 30 # Row gap (%)
+    orientation: "horizontal" # horizontal or vertical
+
+  # Labels
+  labels:
+    fontsize: 16 # Font size
+    position: "top" # top, bottom, left, right
+    alignment: "center" # left, center, right
+
+  # Output
+  output:
+    dpi: 300 # Output resolution
+    path: null
