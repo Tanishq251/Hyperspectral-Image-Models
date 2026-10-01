@@ -1,0 +1,72 @@
+# ============================================================================
+#  EXAMPLE CONFIG  —  a minimal, alternate setup to copy from.
+# ============================================================================
+#  Run:  python main.py config/example_config.yaml
+#
+#  This one shows a *ratio* split (instead of fixed samples-per-class),
+#  a single dataset, a single model, and explicit per-run seeds.
+#  For the full list of options + comments, see config/config.yaml.
+# ============================================================================
+
+results:
+  directory: "Results/Example_Run"
+  keep_best_worst_checkpoints_only: True
+  checkpoint_pruning_metric: "OA"
+
+dataset:
+  names: ["Pavia University"]
+  run_all_datasets: False
+  patch_size: 11
+  stride: 1
+  verbose: False
+
+model:
+  name: ["SpectralFormer"]
+  run_all_models: False
+  exclude: []
+  print_summary: False
+  summary_only: False
+  summary_depth: 1
+
+data_split:
+  method: "ratio"             # fractional split this time
+  disjoint: False
+  split_samples: null
+  split_ratios: [0.2, 0.1, 0.7]   # train / val / test  (must sum to 1.0)
+  random_state: 0
+  seeds: [0, 1, 2, 3, 4]      # explicit seed per run (5 runs → 5 real splits)
+  print_stats: True
+
+preprocessing:
+  dim_reduction_method: pca
+  num_pca_bands: 30
+  maxpool_kernel: 2
+  use_channel_dim: True
+  band_indices: null
+
+training:
+  num_epochs: 100
+  num_runs: 5
+  batch_size: 64
+  learning_rate: 0.001
+  optimizer: "adam"
+  optimizer_params: {}
+  patience: 10
+  checkpoint_interval: 10
+  num_workers: 8
+
+device:
+  use_cuda: True
+  cuda_device: 0
+
+visualization:
+  generate_maps: False
+  mode: "labeled_only"
+  use_spy_colors: True
+  block_background: True
+  show_colorbar: False
+  dpi: 300
+
+# Map & score arrangement use the same keys as config/config.yaml.
+# They are omitted here to keep this example short; defaults are fine
+# unless you run `--arrange-only` or `--arrange-scores`.

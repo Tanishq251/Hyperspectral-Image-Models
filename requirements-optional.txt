@@ -1,0 +1,37 @@
+# ============================================================================
+#  Hyperspectral Image Models — optional, per-model dependencies
+# ============================================================================
+#  Nothing here is required to run the framework. A model whose dependency is
+#  missing is skipped with a warning; every other model keeps working.
+#  Install what you need:  pip install -r requirements-optional.txt
+# ============================================================================
+
+# Transformer-family models (LFSMIM, DSFormer, GSCViT, HSIMAE, S2Mamba, ...)
+timm>=0.9.0
+
+# Graph models (GraphGST, GraphMamba, MCTGCL, GTCFN, MS2GCAN)
+torch_geometric>=2.4.0
+
+# Spectral (spy) colormaps for classification maps and arranged figures
+spectral>=0.23
+
+# WaveMamba — wavelet decomposition
+PyWavelets>=1.4
+
+# MS2GCAN — spiking neural components
+spikingjelly>=0.0.0.0.14
+
+# FAHM and the shared rope_spectral helper
+beartype>=0.17
+
+# GSCViT / MorphFormer summary printing
+torchsummary>=1.5.1
+torchsummaryX>=1.3.0
+
+# ----------------------------------------------------------------------------
+#  Mamba / SSM models — NOT installable from this file.
+#  These compile CUDA kernels and need --no-build-isolation:
+#      pip install "causal-conv1d>=1.4.0" --no-build-isolation
+#      pip install "mamba-ssm>=2.2.2"     --no-build-isolation
+#  GPU-only: the selective_scan / causal_conv1d kernels have no CPU fallback.
+# ----------------------------------------------------------------------------

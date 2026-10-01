@@ -1,0 +1,45 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+*.egg-info/
+*.egg
+dist/
+build/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+*.log
+
+# Temp repositories
+_tmp_repos/
+
+# Experiment outputs and checkpoints
+Results/
+*.pth
+
+# Locally generated complexity tables (regenerate with model_info.py)
+model_complexity.csv
+model_complexity.tex
+
+# Dataset card - lives on HuggingFace, not in this repo
+readme_dataset.md
+
+# Result tables archive - kept local, used for the paper
+LaTeX_Tables.zip

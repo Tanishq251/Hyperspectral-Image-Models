@@ -1,0 +1,187 @@
+# ============================================================================
+#  Hyperspectral Image Models — MAIN CONFIG
+# ============================================================================
+#  Run:   python main.py                      # uses this file
+#         python main.py config/config.yaml   # explicit
+#         python main.py config/example_config.yaml   # a different setup
+#
+#  Modes: python main.py --list-models        # list registered models
+#         python main.py --list-datasets      # list available datasets
+#         python main.py --arrange-only       # only arrange maps (no training)
+#         python main.py --arrange-scores     # build LaTeX score tables
+#
+#  Only ONE thing is required to get going: set `dataset.names` and
+#  `model.name` below. Everything else has sensible defaults.
+# ============================================================================
+
+
+# ----------------------------------------------------------------------------
+#  1. WHERE RESULTS GO
+# ----------------------------------------------------------------------------
+results:
+  directory: "Results/Samples_30_10_(PCA30)_(32)_(11)"   # all runs saved under here
+  keep_best_worst_checkpoints_only: True   # prune .pth files, keep only best & worst run
+  checkpoint_pruning_metric: "OA"          # metric used to pick best/worst: OA / AA / Kappa
+
+
+# ----------------------------------------------------------------------------
+#  2. DATASETS
+# ----------------------------------------------------------------------------
+#  names: list the datasets to run. Auto-downloaded from HuggingFace if missing.
+#  run_all_datasets: True  → ignore `names`, run every dataset in dataset.yaml
+dataset:
+  names: ["Indian_Pines"]   # used only when run_all_datasets is False
+  run_all_datasets: True
+  patch_size: 11        # spatial window size (odd number)
+  stride: 1
+  verbose: False
+
+
+# ----------------------------------------------------------------------------
+#  3. MODELS
+# ----------------------------------------------------------------------------
+#  name: list the models to run (see `python main.py --list-models`).
+#  run_all_models: True  → ignore `name`, run every registered model.
+model:
+  name: ["SpectralFormer"]   # used only when run_all_models is False
+  run_all_models: True
+  exclude: []           # model names to skip (useful with run_all_models)
+  print_summary: False  # print torchinfo layer summary before training
+  summary_only: False   # print summary then STOP (no training)
+  summary_depth: 1
+
+
+# ----------------------------------------------------------------------------
+#  4. DATA SPLIT
+# ----------------------------------------------------------------------------
+#  method: "samples" → fixed count per class   |   "ratio" → fractional split
+#    - samples: uses `split_samples` = [train_per_class, val_per_class]
+#    - ratio  : uses `split_ratios`  = [train, val, test]  (must sum to 1.0)
+#  disjoint: True → spatially disjoint split (fixed 50/30/20 internally)
+#
+#  SEEDS  (controls run-to-run variation for num_runs > 1):
+#    - random_state : base seed.
+#    - seeds        : OPTIONAL explicit list, one per run.
+#         • If given  → run 1 uses seeds[0], run 2 uses seeds[1], ...
+#         • If empty  → seeds auto-increase:  random_state, +1, +2, ...
+#           so 5 runs give 5 DIFFERENT splits → real mean ± std.
+#         • Want identical runs? set e.g. seeds: [0, 0, 0, 0, 0]
+data_split:
+  method: "samples"
+  disjoint: False
+  split_samples: [30, 10]     # [train_per_class, val_per_class]  (method: samples)
+  split_samples_overrides:    # per-dataset budget, replaces split_samples for that dataset
+    Indian_Pines: [10, 5]     # smallest classes have only 20 pixels
+  split_ratios: null          # [train, val, test]                (method: ratio)
+  random_state: 0             # base seed
+  seeds: []                   # e.g. [0, 1, 2, 3, 4] — leave [] to auto-increment
+  print_stats: True
+
+
+# ----------------------------------------------------------------------------
+#  5. PREPROCESSING
+# ----------------------------------------------------------------------------
+#  dim_reduction_method: "pca" | "maxpool" | null
+preprocessing:
+  dim_reduction_method: pca
+  num_pca_bands: 30
+  maxpool_kernel: 2
+  use_channel_dim: True   # add a leading channel dim → input shape (1, bands, H, W)
+  band_indices: null      # optional explicit band subset
+
+
+# ----------------------------------------------------------------------------
+#  6. TRAINING
+# ----------------------------------------------------------------------------
+training:
+  num_epochs: 100
+  num_runs: 5             # repeats per model — each run uses a different seed (see above)
+  batch_size: 64
+  learning_rate: 0.001
+  optimizer: "adam"       # adam | adamw | sgd | rmsprop | adagrad | adadelta
+  optimizer_params: {}    # e.g. {weight_decay: 0.01}
+  patience: 10            # early-stopping patience (epochs without val improvement)
+  checkpoint_interval: 10
+  num_workers: 8
+
+
+# ----------------------------------------------------------------------------
+#  7. DEVICE
+# ----------------------------------------------------------------------------
+device:
+  use_cuda: True
+  cuda_device: 1
+
+
+# ----------------------------------------------------------------------------
+#  8. CLASSIFICATION MAPS (generated right after each run's training)
+# ----------------------------------------------------------------------------
+visualization:
+  generate_maps: False
+  mode: "labeled_only"    # "labeled_only" | "full_image"
+  use_spy_colors: True
+  block_background: True
+  show_colorbar: False
+  dpi: 300
+
+
+# ============================================================================
+#  9. MAP ARRANGEMENT   —   python main.py --arrange-only
+# ============================================================================
+#  Stitches saved maps into a paper-ready figure. Dataset selection priority:
+#     all_datasets  >  datasets  >  dataset_dir
+map_arrangement:
+  enabled: False
+  preset: "paper"                 # "paper" | "poster" | "presentation" | null
+
+  base_output_dir: "Results/Samples_30_10_(PCA30)_(32)_(11)"
+  all_datasets: False
+  datasets: ["Dioni", "WHU-Hi-HanChuan", "Pingan", "Houston18"]
+  dataset_dir: "WHU-Hi-HanChuan"  # single-dataset fallback (only if `datasets` empty)
+
+  all_models: False
+  models: [SpectralFormer, S2Gformer, MASSFormer, FAHM, SSMamba, DSFormer,
+           S3ANet, MambaHSI, MambaHSI_Plus, IGroupSS-Mamba]
+  map_type: ["worst"]             # which run's map: "best" | "worst"
+  metric: ["OA"]                  # metric used to pick best/worst
+
+  visualization:
+    mode: "labeled_only"
+    cmap: "spy_colors"
+    use_spy_colors: True
+    block_background: True
+    include_gt: False
+    regenerate_maps: False
+    include_legend: False
+    legend_cols: 6
+    legend_fontsize: null         # null = auto (0.9 x label size)
+
+  layout:
+    rows: null                    # null = auto
+    cols: null
+    gap: 4                        # space between maps, % of map width
+    row_gap: 4                    # space between rows, % of map height
+    orientation: "horizontal"
+    figure_width: 7.16            # printed width in inches (7.16 = double column, 3.5 = single column)
+    max_figure_height: 9.0        # maps shrink to keep the figure within this height
+
+  labels:
+    fontsize: auto                # auto = scaled to figure_width (~9 pt at 7.16"), or a number in pt
+    show_metric: false            # true adds "(OA=..%)" under each model name
+    position: "bottom"
+    alignment: "center"
+
+  output:
+    dpi: 300
+    path: null
+
+
+# ============================================================================
+#  10. SCORE ARRANGEMENT   —   python main.py --arrange-scores
+# ============================================================================
+#  Builds LaTeX tables (mean ± std over runs) from results_summary.csv files.
+score_arrangement:
+  all_datasets: True    # True = every dataset folder under results.directory
+  all_models: True      # True = every model; else use `models` below
+  models: []
+  use_mean: True        # report mean over runs (vs single best run)

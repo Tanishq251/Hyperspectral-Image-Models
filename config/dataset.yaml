@@ -1,0 +1,785 @@
+datasets:
+  Houston18:
+    height: 1202
+    width: 4768
+    bands: 48
+    num_classes: 20
+    class_names:
+    - Healthy Grass
+    - Stressed Grass
+    - Artificial Turf
+    - Evergreen Trees
+    - Deciduous Trees
+    - Bare Earth
+    - Water
+    - Residential Buildings
+    - Non-residential Buildings
+    - Roads
+    - Sidewalks
+    - Crosswalks
+    - Major Thoroughfares
+    - Highways
+    - Railways
+    - Paved Parking Lots
+    - Unpaved Parking Lots
+    - Cars
+    - Trains
+    - Stadium Seats
+    total_samples: 5734336
+    labeled_samples: 15029
+    class_samples:
+      Class_1: 39196
+      Class_2: 130008
+      Class_3: 2736
+      Class_4: 54322
+      Class_5: 20172
+      Class_6: 18064
+      Class_7: 1064
+      Class_8: 158995
+      Class_9: 894769
+      Class_10: 183283
+      Class_11: 136035
+      Class_12: 6059
+      Class_13: 185438
+      Class_14: 39438
+      Class_15: 27748
+      Class_16: 45932
+      Class_17: 587
+      Class_18: 26289
+      Class_19: 21479
+      Class_20: 27296
+  Qingyun:
+    height: 880
+    width: 1360
+    bands: 176
+    num_classes: 6
+    class_names:
+    - Trees
+    - Car
+    - Asphalt road
+    - Concrete building
+    - Water
+    - Grass
+    total_samples: 1196800
+    labeled_samples: 954893
+    class_samples:
+      Class_1: 278150
+      Class_2: 179512
+      Class_3: 13783
+      Class_4: 9767
+      Class_5: 217735
+      Class_6: 255946
+  Houston13:
+    height: 349
+    width: 1905
+    bands: 144
+    num_classes: 15
+    class_names:
+    - Healthy Grass
+    - Stressed Grass
+    - Synthetic Grass
+    - Trees
+    - Soil
+    - Water
+    - Residential
+    - Commercial
+    - Road
+    - Highway
+    - Railway
+    - Parking Lot 1
+    - Parking Lot 2
+    - Tennis Court
+    - Running Track
+    total_samples: 664845
+    labeled_samples: 15029
+    class_samples:
+      Class_1: 1251
+      Class_2: 1254
+      Class_3: 697
+      Class_4: 1244
+      Class_5: 1242
+      Class_6: 325
+      Class_7: 1268
+      Class_8: 1244
+      Class_9: 1252
+      Class_10: 1227
+      Class_11: 1235
+      Class_12: 1233
+      Class_13: 469
+      Class_14: 428
+      Class_15: 660
+  Salinas:
+    height: 512
+    width: 217
+    bands: 204
+    num_classes: 16
+    class_names:
+    - Brocoli_green_weeds_1
+    - Brocoli_green_weeds_2
+    - Fallow
+    - Fallow_rough_plow
+    - Fallow_smooth
+    - Stubble
+    - Celery
+    - Grapes_untrained
+    - Soil_vinyard_develop
+    - Corn_senesced_green_weeds
+    - Lettuce_romaine_4wk
+    - Lettuce_romaine_5wk
+    - Lettuce_romaine_6wk
+    - Lettuce_romaine_7wk
+    - Vinyard_untrained
+    - Vinyard_vertical_trellis
+    total_samples: 111104
+    labeled_samples: 54129
+    class_samples:
+      Class_1: 2009
+      Class_2: 3726
+      Class_3: 1976
+      Class_4: 1394
+      Class_5: 2678
+      Class_6: 3959
+      Class_7: 3579
+      Class_8: 11271
+      Class_9: 6203
+      Class_10: 3278
+      Class_11: 1068
+      Class_12: 1927
+      Class_13: 916
+      Class_14: 1070
+      Class_15: 7268
+      Class_16: 1807
+  Dioni:
+    height: 250
+    width: 1376
+    bands: 176
+    num_classes: 12
+    class_names:
+    - Dense Urban Fabric
+    - Mineral Extraction Sites
+    - Non Irrigated Arable Land
+    - Fruit Trees
+    - Olive Groves
+    - Coniferous Forest
+    - Dense Sclerophyllous Vegetation
+    - Sparce Sclerophyllous Vegetation
+    - Sparsely Vegetated Areas
+    - Rocks and Sand
+    - Water
+    - Coastal Water
+    total_samples: 344000
+    labeled_samples: 20024
+    class_samples:
+      Class_1: 1262
+      Class_2: 204
+      Class_3: 614
+      Class_4: 150
+      Class_5: 1768
+      Class_6: 0
+      Class_7: 361
+      Class_8: 0
+      Class_9: 5035
+      Class_10: 6374
+      Class_11: 1754
+      Class_12: 492
+  WHU-Hi-HanChuan:
+    height: 1217
+    width: 303
+    bands: 274
+    num_classes: 16
+    class_names:
+    - Strawberry
+    - Cowpea
+    - Soybean
+    - Sorghum
+    - Water spinach
+    - Watermelon
+    - Greens
+    - Trees
+    - Grass
+    - Red roof
+    - Gray roof
+    - Plastic
+    - Bare soil
+    - Road
+    - Bright object
+    - Water
+    total_samples: 368751
+    labeled_samples: 257530
+    class_samples:
+      Class_1: 44735
+      Class_2: 22753
+      Class_3: 10287
+      Class_4: 5353
+      Class_5: 1200
+      Class_6: 4533
+      Class_7: 5903
+      Class_8: 17978
+      Class_9: 9469
+      Class_10: 10516
+      Class_11: 16911
+      Class_12: 3679
+      Class_13: 9116
+      Class_14: 18560
+      Class_15: 1136
+      Class_16: 75401
+  Botswana:
+    height: 1476
+    width: 256
+    bands: 145
+    num_classes: 14
+    class_names:
+    - Water
+    - Hippo grass
+    - Floodplain grasses 1
+    - Floodplain grasses 2
+    - Reeds
+    - Riparian
+    - Firescar
+    - Island interior
+    - Acacia woodlands
+    - Acacia shrublands
+    - Acacia grasslands
+    - Short mopane
+    - Mixed mopane
+    - Exposed soils
+    total_samples: 377856
+    labeled_samples: 3248
+    class_samples:
+      Class_1: 270
+      Class_2: 101
+      Class_3: 251
+      Class_4: 215
+      Class_5: 269
+      Class_6: 269
+      Class_7: 259
+      Class_8: 203
+      Class_9: 314
+      Class_10: 248
+      Class_11: 305
+      Class_12: 181
+      Class_13: 268
+      Class_14: 95
+  Pingan:
+    height: 1230
+    width: 1000
+    bands: 176
+    num_classes: 10
+    class_names:
+    - Seawater
+    - Road
+    - Trees
+    - Floating pier
+    - Brick houses
+    - Steel houses
+    - Ship
+    - Car
+    - Concrete building
+    - Grass
+    total_samples: 1230000
+    labeled_samples: 1140937
+    class_samples:
+      Class_1: 48935
+      Class_2: 578113
+      Class_3: 8345
+      Class_4: 88973
+      Class_5: 20759
+      Class_6: 14086
+      Class_7: 13991
+      Class_8: 83113
+      Class_9: 8108
+      Class_10: 276514
+  Berlin:
+    height: 1723
+    width: 476
+    bands: 244
+    num_classes: 8
+    class_names:
+    - Forest
+    - Residential
+    - Industrial
+    - Low Plants
+    - Soil
+    - Allotment
+    - Commercial
+    - Water
+    total_samples: 820148
+    labeled_samples: 464671
+    class_samples:
+      Class_1: 54954
+      Class_2: 268642
+      Class_3: 19566
+      Class_4: 59282
+      Class_5: 17426
+      Class_6: 13305
+      Class_7: 24824
+      Class_8: 6672
+  Trento:
+    height: 166
+    width: 600
+    bands: 63
+    num_classes: 6
+    class_names:
+    - Apples
+    - Buildings
+    - Ground
+    - Woods
+    - Vineyard
+    - Roads
+    total_samples: 99600
+    labeled_samples: 30214
+    class_samples:
+      Class_1: 4034
+      Class_2: 2903
+      Class_3: 479
+      Class_4: 9123
+      Class_5: 10501
+      Class_6: 3174
+  NiliFossae:
+    height: 478
+    width: 593
+    bands: 425
+    num_classes: 9
+    class_names:
+    - Fe-Olivine
+    - Epidote
+    - Chlorite
+    - Bassanite
+    - Illite/Muscovite
+    - Mg-Carbonate
+    - Plagioclase
+    - Prehnite
+    - Serpentine
+    total_samples: 283454
+    labeled_samples: 26710
+    class_samples:
+      Class_1: 8563
+      Class_2: 996
+      Class_3: 386
+      Class_4: 3286
+      Class_5: 228
+      Class_6: 4867
+      Class_7: 1057
+      Class_8: 1161
+      Class_9: 6166
+  WHU-Hi-LongKou:
+    height: 550
+    width: 400
+    bands: 270
+    num_classes: 9
+    class_names:
+    - Corn
+    - Cotton
+    - Sesame
+    - Broad-leaf soybean
+    - Narrow-leaf soybean
+    - Rice
+    - Water
+    - Roads and houses
+    - Mixed weed
+    total_samples: 220000
+    labeled_samples: 204542
+    class_samples:
+      Class_1: 34511
+      Class_2: 8374
+      Class_3: 3031
+      Class_4: 63212
+      Class_5: 4151
+      Class_6: 11854
+      Class_7: 67056
+      Class_8: 7124
+      Class_9: 5229
+  Holden:
+    height: 595
+    width: 440
+    bands: 418
+    num_classes: 6
+    class_names:
+    - Analcime
+    - Plagioclase
+    - Prehnite
+    - High-Ca Pyroxene
+    - Serpentine
+    - Margarite
+    total_samples: 261800
+    labeled_samples: 20090
+    class_samples:
+      Class_1: 940
+      Class_2: 1472
+      Class_3: 1560
+      Class_4: 6963
+      Class_5: 8697
+      Class_6: 458
+  Indian_Pines:
+    height: 200
+    width: 145
+    bands: 145
+    num_classes: 16
+    class_names:
+    - Alfalfa
+    - Corn-notill
+    - Corn-mintill
+    - Corn
+    - Grass-pasture
+    - Grass-trees
+    - Grass-pasture-mowed
+    - Hay-windrowed
+    - Oats
+    - Soybean-notill
+    - Soybean-mintill
+    - Soybean-clean
+    - Wheat
+    - Woods
+    - Buildings-Grass-Trees-Drives
+    - Stone-Steel-Towers
+    total_samples: 29000
+    labeled_samples: 10249
+    class_samples:
+      Class_1: 46
+      Class_2: 1428
+      Class_3: 830
+      Class_4: 237
+      Class_5: 483
+      Class_6: 730
+      Class_7: 28
+      Class_8: 478
+      Class_9: 20
+      Class_10: 972
+      Class_11: 2455
+      Class_12: 593
+      Class_13: 205
+      Class_14: 1265
+      Class_15: 386
+      Class_16: 93
+  Utopia:
+    height: 478
+    width: 595
+    bands: 432
+    num_classes: 9
+    class_names:
+    - Analcime
+    - Bassanite
+    - High-Ca Pyroxene
+    - Illite/Muscovite
+    - Low-Ca Pyroxene
+    - Mg-Smectite
+    - Monohydrated sulfate
+    - Plagioclase
+    - Prehnite
+    total_samples: 284410
+    labeled_samples: 17338
+    class_samples:
+      Class_1: 1751
+      Class_2: 5807
+      Class_3: 432
+      Class_4: 272
+      Class_5: 6774
+      Class_6: 1166
+      Class_7: 340
+      Class_8: 202
+      Class_9: 594
+  Tangdoaowan:
+    height: 1740
+    width: 860
+    bands: 176
+    num_classes: 18
+    class_names:
+    - Rubber track
+    - Asphalt
+    - Grassland
+    - Ligustrum vicaryi
+    - Bare soil
+    - Populus
+    - Flagging
+    - Boardwalk
+    - Bulrush
+    - Coniferous pine
+    - Buxus sinica
+    - Ulmus pumila L
+    - Sandy
+    - Roof shadows
+    - Gravel road
+    - Spiraea
+    - Photinia serrulata
+    - Seawater
+    total_samples: 1496400
+    labeled_samples: 557366
+    class_samples:
+      Class_1: 25849
+      Class_2: 55553
+      Class_3: 34037
+      Class_4: 60690
+      Class_5: 1862
+      Class_6: 37125
+      Class_7: 14127
+      Class_8: 64087
+      Class_9: 30695
+      Class_10: 1783
+      Class_11: 21236
+      Class_12: 749
+      Class_13: 1686
+      Class_14: 886
+      Class_15: 14020
+      Class_16: 140904
+      Class_17: 9802
+      Class_18: 42275
+  Pavia Center:
+    height: 1096
+    width: 715
+    bands: 102
+    num_classes: 9
+    class_names:
+    - Water
+    - Trees
+    - Asphalt
+    - Self-Blocking Bricks
+    - Bitumen
+    - Tiles
+    - Shadows
+    - Meadows
+    - Bare Soil
+    total_samples: 783640
+    labeled_samples: 148152
+    class_samples:
+      Class_1: 65971
+      Class_2: 7598
+      Class_3: 3090
+      Class_4: 2685
+      Class_5: 6584
+      Class_6: 9248
+      Class_7: 7287
+      Class_8: 42826
+      Class_9: 2863
+  Augsburg:
+    height: 332
+    width: 485
+    bands: 180
+    num_classes: 7
+    class_names:
+    - Forest
+    - Residential Area
+    - Industrial Area
+    - Low Plants
+    - Allotment
+    - Commercial Area
+    - Water
+    total_samples: 161020
+    labeled_samples: 78294
+    class_samples:
+      Class_1: 13507
+      Class_2: 30329
+      Class_3: 3851
+      Class_4: 26857
+      Class_5: 575
+      Class_6: 1645
+      Class_7: 1530
+  WHU-Hi-HongHu:
+    height: 940
+    width: 475
+    bands: 270
+    num_classes: 22
+    class_names:
+    - Red roof
+    - Road
+    - Bare soil
+    - Cotton
+    - Cotton firewood
+    - Rape
+    - Chinese cabbage
+    - Pakchoi
+    - Cabbage
+    - Tuber mustard
+    - Brassica parachinensis
+    - Brassica chinensis
+    - Small Brassica chinensis
+    - Lactuca sativa
+    - Celtuce
+    - Film covered lettuce
+    - Romaine lettuce
+    - Carrot
+    - White radish
+    - Garlic sprout
+    - Broad bean
+    - Tree
+    total_samples: 446500
+    labeled_samples: 386693
+    class_samples:
+      Class_1: 14041
+      Class_2: 3512
+      Class_3: 21821
+      Class_4: 163285
+      Class_5: 6218
+      Class_6: 44557
+      Class_7: 24103
+      Class_8: 4054
+      Class_9: 10819
+      Class_10: 12394
+      Class_11: 11015
+      Class_12: 8954
+      Class_13: 22507
+      Class_14: 7356
+      Class_15: 1002
+      Class_16: 7262
+      Class_17: 3010
+      Class_18: 3217
+      Class_19: 8712
+      Class_20: 3486
+      Class_21: 1328
+      Class_22: 4040
+  KSC:
+    height: 512
+    width: 614
+    bands: 176
+    num_classes: 13
+    class_names:
+    - Scrub
+    - Willow swamp
+    - CP hammock
+    - Slash pine
+    - Oak/Broadleaf
+    - Hardwood
+    - Swamp
+    - Graminoid marsh
+    - Spartina marsh
+    - Cattail marsh
+    - Salt marsh
+    - Mud flats
+    - Water
+    total_samples: 314368
+    labeled_samples: 5211
+    class_samples:
+      Class_1: 761
+      Class_2: 243
+      Class_3: 256
+      Class_4: 252
+      Class_5: 161
+      Class_6: 229
+      Class_7: 105
+      Class_8: 431
+      Class_9: 520
+      Class_10: 404
+      Class_11: 419
+      Class_12: 503
+      Class_13: 927
+  Muufl:
+    height: 325
+    width: 220
+    bands: 64
+    num_classes: 11
+    class_names:
+    - Trees
+    - Mostly grass
+    - Mixed ground surface
+    - Dirt and sand
+    - Road
+    - Water
+    - Buildings shadow
+    - Buildings
+    - Sidewalk
+    - Yellow curb
+    - Cloth panels
+    total_samples: 71500
+    labeled_samples: 53687
+    class_samples:
+      Class_1: 23246
+      Class_2: 4270
+      Class_3: 6882
+      Class_4: 1826
+      Class_5: 6687
+      Class_6: 466
+      Class_7: 2233
+      Class_8: 6240
+      Class_9: 1385
+      Class_10: 183
+      Class_11: 269
+  Loukia:
+    height: 249
+    width: 945
+    bands: 176
+    num_classes: 14
+    class_names:
+    - Dense Urban Fabric
+    - Mineral Extraction Sites
+    - Non Irrigated Arable Land
+    - Fruit Trees
+    - Olive Groves
+    - Broad Leaved Forest
+    - Coniferous Forest
+    - Mixed Forest
+    - Dense Sclerophyllous Vegetation
+    - Sparce Sclerophyllous Vegetation
+    - Sparsely Vegetated Areas
+    - Rocks and Sand
+    - Water
+    - Coastal Water
+    total_samples: 235305
+    labeled_samples: 13503
+    class_samples:
+      Class_1: 288
+      Class_2: 67
+      Class_3: 542
+      Class_4: 79
+      Class_5: 1401
+      Class_6: 223
+      Class_7: 500
+      Class_8: 1072
+      Class_9: 3793
+      Class_10: 2803
+      Class_11: 404
+      Class_12: 487
+      Class_13: 1393
+      Class_14: 451
+  Pavia University:
+    height: 610
+    width: 340
+    bands: 103
+    num_classes: 9
+    class_names:
+    - Asphalt
+    - Meadows
+    - Gravel
+    - Trees
+    - Painted metal sheets
+    - Bare Soil
+    - Bitumen
+    - Self-Blocking Bricks
+    - Shadows
+    total_samples: 207400
+    labeled_samples: 42776
+    class_samples:
+      Class_1: 6631
+      Class_2: 18649
+      Class_3: 2099
+      Class_4: 3064
+      Class_5: 1345
+      Class_6: 5029
+      Class_7: 1330
+      Class_8: 3682
+      Class_9: 947
+  Chikusei:
+    height: 2517
+    width: 2335
+    bands: 128
+    num_classes: 19
+    class_names:
+    - Water
+    - Bare soil (farmland)
+    - Bare soil (park)
+    - Bare soil (roadside)
+    - Pavement (asphalt)
+    - Pavement (brick)
+    - Farmland (paddy)
+    - Farmland (other)
+    - Greenhouse
+    - Grass (park)
+    - Grass (roadside)
+    - Tree (park)
+    - Tree (roadside)
+    - Forest
+    - Building (low-rise)
+    - Building (high-rise)
+    - Building (factory)
+    - Power line
+    - Swimming pool
+    total_samples: 5877195
+    labeled_samples: 77592
