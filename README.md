@@ -229,7 +229,7 @@ If this framework is useful in your research, please cite it — and the origina
 
 ```bibtex
 @misc{rachamalla2026hsi,
-      title={Hyperspectral Image Models: Technical Report}, 
+      title={A PyTorch Library For Hyperspectral Image Models: Technical Report}, 
       author={Tanishq Rachamalla and Aryan Das and Srishti Kaushik and Swalpa Kumar Roy},
       year={2026},
       eprint={2609.39871},
