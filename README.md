@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=700&size=30&duration=3200&pause=900&color=EE4C2C&center=true&vCenter=true&width=820&lines=%F0%9F%9B%B0%EF%B8%8F++Hyperspectral+Image+Models;55+Models.+24+Datasets.+One+Config.;One+Protocol.+Comparable+Numbers." alt="Hyperspectral Image Models" />
+<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=700&size=30&duration=3200&pause=900&color=EE4C2C&center=true&vCenter=true&width=820&lines=%F0%9F%9B%B0%EF%B8%8F++Hyperspectral+Image+Models;56+Models.+24+Datasets.+One+Config.;One+Protocol.+Comparable+Numbers." alt="Hyperspectral Image Models" />
 
 ### A PyTorch Library for Hyperspectral Image Models
 
@@ -9,14 +9,14 @@
 [![HuggingFace](https://img.shields.io/badge/🤗_Datasets-24-FFD21E?style=for-the-badge)](https://huggingface.co/datasets/Tanishq165/HSI_Datasets)
 [![License](https://img.shields.io/badge/License-Apache_2.0-green?style=for-the-badge)](LICENSE)
 
-<img src="https://img.shields.io/badge/Models-55-orange?style=flat-square" />
+<img src="https://img.shields.io/badge/Models-56-orange?style=flat-square" />
 <img src="https://img.shields.io/badge/Years-2017–2026-blueviolet?style=flat-square" />
 <img src="https://img.shields.io/badge/Families-6-informational?style=flat-square" />
 <img src="https://img.shields.io/badge/Scenes-Earth_+_Mars_🪐-critical?style=flat-square" />
 
 <br>
 
-**Benchmark 55 hyperspectral models across 24 datasets — from a single YAML file.**
+**Benchmark 56 hyperspectral models across 24 datasets — from a single YAML file.**
 
 **⚡ Fast to start · 🪶 Memory-efficient · 🔁 Reproducible**
 
@@ -33,7 +33,7 @@ python main.py                    # train, evaluate, and write results
 
 ## ✨ Highlights
 
-- 🧠 **Large model inventory:** 55 architectures from 2017–2026, across six families (CNN, Transformer, Mamba/SSM, Graph, KAN and self-supervised), all behind one API.
+- 🧠 **Large model inventory:** 56 architectures from 2017–2026, across six families (CNN, Transformer, Mamba/SSM, Graph, KAN and self-supervised), all behind one API.
 - 🌍 **24 benchmark scenes:** Airborne, Spaceborne, UAV and Mars CRISM data, downloaded from HuggingFace on first use and cached after that.
 - 🪶 **Memory-efficient data loading:** a typical HSI pipeline extracts every patch up front and holds them all in RAM. This library keeps one normalised cube plus a list of patch positions, and cuts each patch on the fly when the model asks for it. Large scenes stay light on memory.
 - ⚡ **Faster to start:** since nothing is pre-extracted, there is no slow patch-building step before training begins. Datasets are cached after the first download, so later runs skip it.
@@ -51,7 +51,7 @@ flowchart LR
     A["📄 config.yaml<br/><sub>datasets · models · seeds</sub>"] --> B["🤗 Auto-Download<br/><sub>24 HSI scenes</sub>"]
     B --> C["✂️ Split<br/><sub>random or disjoint</sub>"]
     C --> D["🧮 Preprocess<br/><sub>PCA · on-the-fly patches</sub>"]
-    D --> E["🧠 Train<br/><sub>55 models, 1 API</sub>"]
+    D --> E["🧠 Train<br/><sub>56 models, 1 API</sub>"]
     E --> F["🔁 Repeat<br/><sub>seeds 1..N</sub>"]
     F --> G["📊 LaTeX Table<br/><sub>OA/AA/κ ± std</sub>"]
     F --> H["🗺️ Map Figure<br/><sub>publication-ready</sub>"]
@@ -68,11 +68,11 @@ flowchart LR
 
 ## 💡 Why This Exists
 
-Comparing HSI models usually means cloning a dozen repos, each with its own data loader, split logic, and training loop — and then comparing numbers that were never produced the same way. This framework puts **55 models (2017–2026) behind one interface**, on **24 auto-downloaded datasets**, with a shared split protocol and seeded repeated runs, so every model is measured under identical conditions.
+Comparing HSI models usually means cloning a dozen repos, each with its own data loader, split logic, and training loop — and then comparing numbers that were never produced the same way. This framework puts **56 models (2017–2026) behind one interface**, on **24 auto-downloaded datasets**, with a shared split protocol and seeded repeated runs, so every model is measured under identical conditions.
 
 |  |  |
 |---|---|
-| 🧠 **55 models** | CNN · Transformer · Mamba/SSM · Graph · KAN · self-supervised — [full zoo →](docs/MODELS.md) |
+| 🧠 **56 models** | CNN · Transformer · Mamba/SSM · Graph · KAN · self-supervised — [full zoo →](docs/MODELS.md) |
 | 📦 **24 datasets** | Auto-downloaded from HuggingFace on first use — [details →](docs/DATASETS.md) |
 | 🪶 **Low RAM** | Patches are sliced on the fly instead of pre-extracted and held in memory |
 | ⚙️ **One config** | Datasets, models, splits, preprocessing, training, figures — all in one YAML |
@@ -115,7 +115,7 @@ These kernels have **no CPU fallback** — Mamba-family models require a GPU. Ev
 **2. See what's available:**
 
 ```bash
-python main.py --list-models      # 55 models
+python main.py --list-models      # 56 models
 python main.py --list-datasets    # 24 datasets
 ```
 
@@ -146,7 +146,7 @@ That's the whole loop. Results land in `{results.directory}/{dataset}/{model}/ru
 
 | Guide | What's in it |
 |---|---|
-| 🧠 [**Model Zoo**](docs/MODELS.md) | All 55 models by family, with paper, venue, year and official code |
+| 🧠 [**Model Zoo**](docs/MODELS.md) | All 56 models by family, with paper, venue, year and official code |
 | 📦 [**Datasets**](docs/DATASETS.md) | All 24 scenes — dimensions, bands, classes, sensors, config keys |
 | ⚙️ [**Configuration**](docs/CONFIG.md) | Every setting explained, plus reproducibility and protocol notes |
 | 🧰 [**Codebase Guide**](docs/CODEBASE.md) | Repository map, utilities, all commands, output layout |
@@ -157,14 +157,14 @@ That's the whole loop. Results land in `{results.directory}/{dataset}/{model}/ru
 ## 🔍 At a Glance
 
 <details>
-<summary><b>🧠 The 55 models by family</b></summary>
+<summary><b>🧠 The 56 models by family</b></summary>
 
 <br>
 
 | Family | Count | Models |
 |---|:--:|---|
 | **Transformer** | 16 | SpectralFormer · MFT · GAHT · MASSFormer · MorphFormer · SSFTTNet · CTMixer · 3DConvSST · DBCTNet · DSFormer · HSIC_SClusterFormer · MMFormer · GSCViT · S2Gformer · MVAHN · FAHM |
-| **Mamba / SSM** | 20 | MambaHSI · MambaHSI_Plus · SSMamba · S2Mamba · WaveMamba · MiM · PHDMamba · IGroupSS-Mamba · HyPyraMamba · MLFMamba · MambaMoE · HyperMamba · MambaLG · MorpMamba · MHSSMamba · ConvVitMamba · EMamba · FuzzySpectralMamba · GraphMamba · R2Mamba |
+| **Mamba / SSM** | 21 | MambaHSI · MambaHSI_Plus · SSMamba · S2Mamba · WaveMamba · MiM · PHDMamba · IGroupSS-Mamba · HyPyraMamba · MLFMamba · MambaMoE · HyperMamba · MambaLG · MorpMamba · MHSSMamba · ConvVitMamba · EMamba · FuzzySpectralMamba · GraphMamba · R2Mamba · PyS2CFMamba |
 | **CNN** | 10 | SSRN · HybridSN · pResNet · DBDA · ENL_FCN · SACNet · SSTN · S3ANet · FETNet · DKDMN |
 | **Graph / GCN** | 4 | GraphGST · MCTGCL · GTCFN · MS2GCAN |
 | **KAN** | 2 | HyperKAN · HSIConvKAN |
@@ -229,7 +229,7 @@ If this framework is useful in your research, please cite it — and the origina
 
 ```bibtex
 @misc{rachamalla2026hsi,
-      title={A PyTorch Library For Hyperspectral Image Models: Technical Report}, 
+      title={A PyTorch Library for Hyperspectral Image Models: Technical Report}, 
       author={Tanishq Rachamalla and Aryan Das and Srishti Kaushik and Swalpa Kumar Roy},
       year={2026},
       eprint={2609.39871},

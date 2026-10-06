@@ -21,13 +21,13 @@ Models that depend on an optional package that isn't installed (see [installatio
 | CNN (2D/3D, residual, attention) | `SSRN`, `HybridSN`, `pResNet`, `DBDA`, `ENL_FCN`, `SACNet` |
 | Transformer | `SpectralFormer`, `MFT`, `GAHT`, `MASSFormer`, `MorphFormer`, `SSFTTNet`, `CTMixer`, `3DConvSST`, `DSFormer`, `HSIC_SClusterFormer` |
 | Graph / GCN | `GraphGST`, `MCTGCL`, `GraphMamba`, `GTCFN`, `MS2GCAN` |
-| Mamba / State-Space | `MambaHSI`, `S2Mamba`, `SSMamba`, `IGroupSS-Mamba`, `WaveMamba`, `MiM`, `PHDMamba`, `HyperMamba`, `MambaLG`, `MorpMamba`, `EMamba`, `R2Mamba` |
+| Mamba / State-Space | `MambaHSI`, `S2Mamba`, `SSMamba`, `IGroupSS-Mamba`, `WaveMamba`, `MiM`, `PHDMamba`, `HyperMamba`, `MambaLG`, `MorpMamba`, `EMamba`, `R2Mamba`, `PyS2CFMamba` |
 | Kolmogorov-Arnold (KAN) | `HyperKAN`, `HSIConvKAN` |
 | Self-supervised / masked pretraining | `HSIMAE`, `LFSMIM`, `HSIC_FM` |
 
 ### Model Zoo
 
-All **55** registered models, grouped by architecture family, with the original paper and the authors' reference implementation. Metadata is generated directly from `MODEL_CATALOG` in `models/registry.py`, so this table and the code cannot drift apart.
+All **56** registered models, grouped by architecture family, with the original paper and the authors' reference implementation. Metadata is generated directly from `MODEL_CATALOG` in `models/registry.py`, so this table and the code cannot drift apart.
 
 ### Transformer
 
@@ -74,6 +74,7 @@ All **55** registered models, grouped by architecture family, with the original 
 | **`HyPyraMamba`** | Pyramid Spectral Attention and Mamba-Based Architecture | 2026 | IEEE TGRS | [Link](https://doi.org/10.1109/TGRS.2025.3650350) | [GitHub](https://github.com/dekai-li/HyPyraMamba) |
 | **`MLFMamba`** | Multi-Level Feature Mamba | 2026 | The Visual Computer (Springer) | [Link](https://doi.org/10.1007/s00371-026-04496-w) | [GitHub](https://github.com/foopy113/MLF) |
 | **`R2Mamba`** | Route-Reliability Mamba | 2026 | IEEE JSTARS | [Link](https://doi.org/10.1109/JSTARS.2026.3728152) | [GitHub](https://github.com/xunshang111/R2Mamba-HSI) |
+| **`PyS2CFMamba`** | PyS2CF-Mamba | 2026 | IEEE GRSL | [Link](https://doi.org/10.1109/LGRS.2026.3732153) | [GitHub](https://github.com/JiaxinLiCAS/PyS2CF-Mamba) |
 
 ### CNN
 

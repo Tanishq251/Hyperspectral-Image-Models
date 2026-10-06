@@ -471,6 +471,14 @@ MODEL_CATALOG = {
         'year': 2026,
         'venue': "Information Fusion (Elsevier)",
     },
+    "PyS2CFMamba": {
+        'full_name': "PyS2CF-Mamba",
+        'paper_title': "PyS2CF-Mamba: A Pyramid Spatial-Spectral Competitive Fusion Mamba Network for Hyperspectral Image Classification",
+        'paper': "https://doi.org/10.1109/LGRS.2026.3732153",
+        'code': "https://github.com/JiaxinLiCAS/PyS2CF-Mamba",
+        'year': 2026,
+        'venue': "IEEE GRSL",
+    },
 }
 
 
