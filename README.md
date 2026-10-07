@@ -72,8 +72,8 @@ Comparing HSI models usually means cloning a dozen repos, each with its own data
 
 |  |  |
 |---|---|
-| 🧠 **56 models** | CNN · Transformer · Mamba/SSM · Graph · KAN · self-supervised — [full zoo →](docs/MODELS.md) |
-| 📦 **24 datasets** | Auto-downloaded from HuggingFace on first use — [details →](docs/DATASETS.md) |
+| 🧠 **56 models** | CNN · Transformer · Mamba/SSM · Graph · KAN · self-supervised — [full zoo →](docs/DOCUMENTATION.md#-model-zoo) |
+| 📦 **24 datasets** | Auto-downloaded from HuggingFace on first use — [details →](docs/DOCUMENTATION.md#-datasets) |
 | 🪶 **Low RAM** | Patches are sliced on the fly instead of pre-extracted and held in memory |
 | ⚙️ **One config** | Datasets, models, splits, preprocessing, training, figures — all in one YAML |
 | 🔁 **Repeated runs** | Explicit per-run seeds; results reported as mean ± std, not a single run |
@@ -146,11 +146,11 @@ That's the whole loop. Results land in `{results.directory}/{dataset}/{model}/ru
 
 | Guide | What's in it |
 |---|---|
-| 🧠 [**Model Zoo**](docs/MODELS.md) | All 56 models by family, with paper, venue, year and official code |
-| 📦 [**Datasets**](docs/DATASETS.md) | All 24 scenes — dimensions, bands, classes, sensors, config keys |
-| ⚙️ [**Configuration**](docs/CONFIG.md) | Every setting explained, plus reproducibility and protocol notes |
-| 🧰 [**Codebase Guide**](docs/CODEBASE.md) | Repository map, utilities, all commands, output layout |
-| ➕ [**Adding a Model**](docs/CONTRIBUTING.md) | Drop in one file — the registry finds it |
+| 🧠 [**Model Zoo**](docs/DOCUMENTATION.md#-model-zoo) | All 56 models by family, with paper, venue, year and official code |
+| 📦 [**Datasets**](docs/DOCUMENTATION.md#-datasets) | All 24 scenes — dimensions, bands, classes, sensors, config keys |
+| ⚙️ [**Configuration**](docs/DOCUMENTATION.md#%EF%B8%8F-configuration--experiment-design) | Every setting explained, plus reproducibility and protocol notes |
+| 🧰 [**Codebase Guide**](docs/DOCUMENTATION.md#-codebase-guide) | Repository map, utilities, all commands, output layout |
+| ➕ [**Adding a Model**](docs/DOCUMENTATION.md#-adding-a-new-model) | Drop in one file — the registry finds it |
 
 ---
 
@@ -170,7 +170,7 @@ That's the whole loop. Results land in `{results.directory}/{dataset}/{model}/ru
 | **KAN** | 2 | HyperKAN · HSIConvKAN |
 | **Self-supervised** | 3 | HSIMAE · LFSMIM · HSIC_FM |
 
-Full table with papers and code links → [docs/MODELS.md](docs/MODELS.md)
+Full table with papers and code links → [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md#-model-zoo)
 
 </details>
 
@@ -187,7 +187,7 @@ Full table with papers and code links → [docs/MODELS.md](docs/MODELS.md)
 **Other** — Chikusei
 **Planetary (Mars, CRISM)** 🪐 — Holden · NiliFossae · Utopia
 
-All auto-downloaded from [🤗 Tanishq165/HSI_Datasets](https://huggingface.co/datasets/Tanishq165/HSI_Datasets). Sizes, bands, classes and sensors → [docs/DATASETS.md](docs/DATASETS.md)
+All auto-downloaded from [🤗 Tanishq165/HSI_Datasets](https://huggingface.co/datasets/Tanishq165/HSI_Datasets). Sizes, bands, classes and sensors → [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md#-datasets)
 
 </details>
 
@@ -219,13 +219,13 @@ Three config-level settings control how reproducible a comparison is:
 - **`training.num_runs`** — repeats; `--arrange-scores` reports mean ± std rather than a best run.
 - **Fixed protocol** — hold `patch_size`, `num_pca_bands` and `split_samples` constant across the models you compare, and report them. They move results more than most architectural differences.
 
-Every run writes its own `config.yaml` snapshot, so results are always traceable. Full notes → [docs/CONFIG.md](docs/CONFIG.md)
+Every run writes its own `config.yaml` snapshot, so results are always traceable. Full notes → [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md#%EF%B8%8F-configuration--experiment-design)
 
 ---
 
 ## 📄 Citation
 
-If this framework is useful in your research, please cite it — and the original paper of every model and dataset you use ([links here](docs/MODELS.md)).
+If this framework is useful in your research, please cite it — and the original paper of every model and dataset you use (links here, in [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md#-model-zoo)).
 
 ```bibtex
 @misc{rachamalla2026hsi,
@@ -255,7 +255,7 @@ Other hyperspectral research from the same authors:
 
 ## 🙏 Acknowledgements
 
-Every model here is a re-implementation of published work — all architectural credit belongs to the original authors, whose papers and reference code are linked in the [Model Zoo](docs/MODELS.md). Datasets are credited to NASA JPL/AVIRIS, Wuhan University, IEEE GRSS, University of Pavia, NASA MRO CRISM, DLR/HyMap, Ocean University of China (QUH) and the University of Southern Mississippi.
+Every model here is a re-implementation of published work — all architectural credit belongs to the original authors, whose papers and reference code are linked in the [Model Zoo](docs/DOCUMENTATION.md#-model-zoo). Datasets are credited to NASA JPL/AVIRIS, Wuhan University, IEEE GRSS, University of Pavia, NASA MRO CRISM, DLR/HyMap, Ocean University of China (QUH) and the University of Southern Mississippi.
 
 ## ⚖️ License
 
